@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../src/api";
+import api from "../../api";
 import { Picker } from '@react-native-picker/picker';
 
 export default function RegisterScreenPet({ navigation }) {

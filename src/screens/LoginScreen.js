@@ -1,16 +1,19 @@
 import React, { useState } from "react";
+import { useFonts, PlayfairDisplay_400Regular } from "@expo-google-fonts/playfair-display";
+import { Nunito_400Regular } from "@expo-google-fonts/nunito";
+import { Button } from "react-native-elements";
 import {
   View,
   TextInput,
-  Button,
   Text,
   StyleSheet,
   Alert,
   TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../src/api";
+import api from "../../api";
 
+  
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -45,43 +48,52 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_400Regular,
+    Nunito_400Regular
+  });
+
+  if (!fontsLoaded) {
+    return null; 
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>PET {"\n"}PODE?</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="E-MAIL"
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
-        placeholder="Senha"
+        placeholder="SENHA"
         secureTextEntry
         value={senha}
         onChangeText={setSenha}
       />
-      <Button title="Entrar" onPress={handleLogin} />
 
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.forgot}>Esqueceu a senha?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
-        <Text>Não possui uma conta? Cadastre-se.</Text>
+      <Button title="LOGIN" onPress={handleLogin} buttonStyle={{ backgroundColor: "#6B4226", borderRadius: 20, padding: 14, marginTop: 10, marginBottom:10 }} titleStyle={{ fontSize: 18, fontFamily:"Nunito_400Regular" }}/>
+
+      <TouchableOpacity onPress={() => navigation.navigate("Cadastro")} style={styles.flexDirection}>
+        <Text Style={styles.linhaconta}>Não possui uma conta?</Text><Text style={styles.cadastro}>Cadastre-se.</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  forgot: {
-    marginTop: 10,
-    color: "blue",
-    textAlign: "center",
-    textDecorationLine: "underline",
-  },
+  container: { flex: 1, justifyContent: "flex-start", padding: 20, backgroundColor:"#F9F3F6" },
+  title: { fontSize: 64, marginTop: 100, marginBottom: 100, textAlign: "center", fontFamily:"PlayfairDisplay_400Regular", color:"#2C2C2C"},
+  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5, fontFamily:"Nunito_400Regular", color:"#6D6D6D", borderRadius: 20},
+  forgot: { color: "#6B4226", textAlign: "right", textDecorationLine: "underline", fontFamily:"Nunito_400Regular"},
+  cadastro: { color: "#6B4226", textAlign: "left", textDecorationLine: "underline", fontFamily:"Nunito_400Regular"},
+  linhaconta:{marginTop: 2, fontFamily:"Nunito_400Regular"},
+  button:{ backgroundColor:"#6B4226", fontFamily:"Nunito_400Regular" },
+  flexDirection:{ flexDirection: "row" }
 });

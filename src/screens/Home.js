@@ -12,7 +12,7 @@ import {
   Modal,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../src/api";
+import api from "../../api";
 
 export default function HomeScreen() {
   const [plantas, setPlantas] = useState([]);
@@ -84,7 +84,7 @@ export default function HomeScreen() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Digite nome da planta ou do pet..."
+          placeholder="Busca"
           value={busca}
           onChangeText={setBusca}
           onSubmitEditing={buscarPlantas}

@@ -7,7 +7,6 @@ import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import RegisterScreenPet from "./src/screens/RegisterScreenPet";
 import Home from "./src/screens/Home";
-import ResetPasswordScreen from "./src/screens/ResetPasswordScreen";
 
 const Stack = createStackNavigator();
 
@@ -35,7 +34,6 @@ export default function App() {
         <Stack.Screen name="Cadastro" component={RegisterScreen} />
         <Stack.Screen name="Cadastro de Pets" component={RegisterScreenPet} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

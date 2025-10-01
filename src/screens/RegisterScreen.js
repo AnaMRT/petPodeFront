@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, Text, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // importar
-import api from "../../src/api";
+import api from "../../api";
 
 export default function RegisterScreen({ navigation }) {
   const [nome, setNome] = useState("");
