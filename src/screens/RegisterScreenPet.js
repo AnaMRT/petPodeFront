@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import { View, TextInput, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import { Picker } from '@react-native-picker/picker';
+import ScreenWrapper from "../components/ScreenWrapper";
+import { Button } from "react-native-elements";
 
 export default function RegisterScreenPet({ navigation }) {
   const [nome, setNome] = useState("");
@@ -11,18 +13,8 @@ export default function RegisterScreenPet({ navigation }) {
   const handleRegisterPet = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-
-      if (!token) {
-        Alert.alert("Erro", "Usuário não autenticado");
-        navigation.navigate("Login");
-        return;
-      }
-
-      await api.post(
-        "/pet",
-        { nome, especie: value },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      if (!token) { Alert.alert("Erro", "Usuário não autenticado"); navigation.navigate("Login"); return; }
+      await api.post("/pet", { nome, especie: value }, { headers: { Authorization: `Bearer ${token}` } });
       Alert.alert("Sucesso", "Pet cadastrado!");
       navigation.navigate("Home");
     } catch (error) {
@@ -36,58 +28,35 @@ export default function RegisterScreenPet({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastro</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        value={nome}
-        onChangeText={setNome}
-      />
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <Text style={styles.title}>CADASTRO</Text>
+        <TextInput style={styles.input} placeholder="NOME" value={nome} onChangeText={setNome} />
 
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={value}
-          onValueChange={(itemValue) => setValue(itemValue)}
-          style={styles.picker}
-          prompt="Selecione a espécie"
-        >
-          <Picker.Item label="Selecione a espécie" value={null} />
-          <Picker.Item label="Canino" value="canino" />
-          <Picker.Item label="Felino" value="felino" />
-        </Picker>
+        <View style={styles.pickerContainer}>
+          <Picker selectedValue={value} onValueChange={setValue} style={styles.picker} prompt="Selecione a espécie">
+            <Picker.Item label="Selecione a espécie" value={null} />
+            <Picker.Item label="Canino" value="canino" />
+            <Picker.Item label="Felino" value="felino" />
+          </Picker>
+        </View>
+
+        <Button buttonStyle={{ backgroundColor: "#6B4226", borderRadius: 20, padding: 14, marginTop: 10, marginBottom:10 }} title="CADASTRO" onPress={handleRegisterPet} />
+
+        <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate("Home")}>
+          <Text style={styles.pular}>Pular</Text>
+        </TouchableOpacity>
       </View>
-
-      <Button title="Cadastrar" onPress={handleRegisterPet} />
-
-       <TouchableOpacity activeOpacity={0.7} onPress={AbrirHome}>
-              <Text>Pular.</Text>
-            </TouchableOpacity>
-    </View>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
-  input: {
-    borderWidth: 1,
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 5,
-    marginLeft: 20,
-    marginRight: 20,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderRadius: 5,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 10,
-    overflow: "hidden",
-  },
-  picker: {
-    height: 50,
-    width: "100%",
-  },
+  container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor:"#F9F3F6" },
+  title: { fontSize: 64, marginBottom: 100, textAlign: "center", fontFamily:"PlayfairDisplay_400Regular", color:"#2C2C2C"},
+  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 20, fontFamily:"Nunito_400Regular", color:"#6D6D6D"},
+  pickerContainer: {borderWidth: 1, marginBottom: 10, borderRadius: 20, fontFamily:"Nunito_400Regular", color:"#6D6D6D"},
+  picker: { fontFamily:"Nunito_400Regular", color:"#6D6D6D" },
+  button:{ backgroundColor:"#6B4226", fontFamily:"Nunito_400Regular" },
+  pular: { color: "#6B4226", textAlign: "right", textDecorationLine: "underline", fontFamily:"Nunito_400Regular"},
 });
