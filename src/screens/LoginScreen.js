@@ -24,14 +24,23 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleForgotPassword = async () => {
-    if (!email) return Alert.alert("Erro", "Digite seu e-mail primeiro.");
+    if (!email) {
+      Alert.alert("Erro", "Digite seu e-mail primeiro.");
+      return;
+    }
     try {
       await api.post(`/auth/forgot-password?email=${email}`);
-      Alert.alert("Verifique seu e-mail", "Enviamos um link para redefinição de senha.");
-    } catch {
+      Alert.alert(
+        "Verifique seu e-mail",
+        "Enviamos um código para redefinição de senha."
+      );
+      navigation.navigate("ResetSenha", { email });
+    } catch (error) {
       Alert.alert("Erro", "Não foi possível enviar o e-mail.");
     }
   };
+
+
 
   const [fontsLoaded] = useFonts({ PlayfairDisplay_400Regular, Nunito_400Regular });
   if (!fontsLoaded) return null;
@@ -51,6 +60,8 @@ export default function LoginScreen({ navigation }) {
           buttonStyle={{ backgroundColor: "#6B4226", borderRadius: 20, padding: 14, marginTop: 10, marginBottom:10 }}
           titleStyle={{ fontSize: 18, fontFamily:"Nunito_400Regular" }}
         />
+
+    
         <TouchableOpacity onPress={() => navigation.navigate("Cadastro")} style={styles.flexDirection}>
           <Text style={styles.linhaconta}>Não possui uma conta?</Text>
           <Text style={styles.cadastro}>Cadastre-se.</Text>
