@@ -14,7 +14,6 @@ import Home from "./src/screens/Home";
 // você pode criar essas telas simples só pra testar
 import { View, Text } from "react-native";
 
-function PerfilScreen() { return <View><Text>Meu Perfil</Text></View>; }
 function PlanoScreen() { return <View><Text>Plano</Text></View>; }
 
 const Stack = createStackNavigator();
@@ -24,7 +23,6 @@ function DrawerRoutes() {
   return (
     <Drawer.Navigator screenOptions={{ headerShown: false }}>
       <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="Meu Perfil" component={PerfilScreen} />
       <Drawer.Screen name="Meus Pets" component={PetsScreen} />
       <Drawer.Screen name="Plantas Favoritas" component={PlantasFavsScreen} />
       <Drawer.Screen name="Plano" component={PlanoScreen} />

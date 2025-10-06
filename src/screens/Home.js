@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndic
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
+import { Icon } from "react-native-elements";
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -46,7 +47,11 @@ export default function HomeScreen({ navigation }) {
   return (
     <ScreenWrapper>
       <TouchableOpacity style={styles.userIcon} onPress={() => navigation.openDrawer()}>
-        <Image source={{ uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" }} style={{ width: 30, height: 30, tintColor: "#6A4226" }} />
+        
+        <Icon
+          name='Home'
+        />
+        {/* <Image source={{ uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" }} style={{ width: 30, height: 30 }} /> */}
       </TouchableOpacity>
 
       <View style={styles.container}>

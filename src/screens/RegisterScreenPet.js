@@ -30,7 +30,7 @@ export default function RegisterScreenPet({ navigation }) {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <Text style={styles.title}>CADASTRO</Text>
+        <Text style={styles.title}>CADASTRE SEU PET</Text>
         <TextInput style={styles.input} placeholder="NOME" value={nome} onChangeText={setNome} />
 
         <View style={styles.pickerContainer}>
