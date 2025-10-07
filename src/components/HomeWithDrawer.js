@@ -15,7 +15,6 @@ export default function HomeWithDrawer() {
     <NavigationContainer independent={true}>
       <Drawer.Navigator screenOptions={{ headerShown: false }}>
         <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Meu Perfil" component={PerfilScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
   );

@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { Icon } from "react-native-elements";
+import { useFonts } from 'expo-font';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -43,15 +45,16 @@ export default function HomeScreen({ navigation }) {
       </Text>
     </TouchableOpacity>
   );
+  const [fontsLoaded] = useFonts({
+  MaterialIcons: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.ttf'),
+  });
+
+  if (!fontsLoaded) return null;
 
   return (
     <ScreenWrapper>
-      <TouchableOpacity style={styles.userIcon} onPress={() => navigation.openDrawer()}>
-        
-        <Icon
-          name='Home'
-        />
-        {/* <Image source={{ uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" }} style={{ width: 30, height: 30 }} /> */}
+      <TouchableOpacity  style={styles.userIcon} onPress={() => navigation.openDrawer()}>
+        <Icon name="home" type="material" color="#000" size={30} />
       </TouchableOpacity>
 
       <View style={styles.container}>
@@ -102,7 +105,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fff" },
   container: { flex: 1, padding: 20 },
-  userIcon: { position: "absolute", top: 10, left: 10, zIndex: 1 },
+  userIcon: { position: "absolute", top: 10, left: 10, zIndex: 1, width:"30" },
   titulo: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
   searchContainer: { flexDirection: "row", marginBottom: 15, alignItems: "center" },
   input: { flex: 1, borderWidth: 1, borderRadius: 8, padding: 10, marginRight: 10 },
