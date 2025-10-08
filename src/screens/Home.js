@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndicator, Keyboard, Modal, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  ActivityIndicator,
+  Keyboard,
+  Modal,
+  StyleSheet,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
-import { Icon } from "react-native-elements";
-import { useFonts } from 'expo-font';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -14,28 +23,51 @@ export default function HomeScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [plantaSelecionada, setPlantaSelecionada] = useState(null);
 
-  useEffect(() => { carregarPlantas(); }, []);
+  useEffect(() => {
+    carregarPlantas();
+  }, []);
 
   const carregarPlantas = async () => {
-    try { setCarregando(true); const response = await api.get("/plantas"); setPlantas(response.data); }
-    catch (error) { console.error(error); }
-    finally { setCarregando(false); }
+    try {
+      setCarregando(true);
+      const response = await api.get("/plantas");
+      setPlantas(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const buscarPlantas = async () => {
     Keyboard.dismiss();
-    if (!busca.trim()) { carregarPlantas(); return; }
+    if (!busca.trim()) {
+      carregarPlantas();
+      return;
+    }
     try {
       setCarregando(true);
       const token = await AsyncStorage.getItem("token");
-      const response = await api.get("/plantas/search", { params: { termo: busca }, headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.get("/plantas/search", {
+        params: { termo: busca },
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setPlantas(response.data);
-    } catch (error) { console.error(error); }
-    finally { setCarregando(false); }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => { setPlantaSelecionada(item); setModalVisible(true); }} style={styles.card}>
+    <TouchableOpacity
+      onPress={() => {
+        setPlantaSelecionada(item);
+        setModalVisible(true);
+      }}
+      style={styles.card}
+    >
       <Image source={{ uri: item.imagemUrl }} style={styles.imagem} />
       <Text style={styles.nome}>{item.nomePopular}</Text>
       <Text style={styles.nomeCientifico}>{item.nomeCientifico}</Text>
@@ -45,26 +77,29 @@ export default function HomeScreen({ navigation }) {
       </Text>
     </TouchableOpacity>
   );
-  const [fontsLoaded] = useFonts({
-  MaterialIcons: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.ttf'),
-  });
-
-  if (!fontsLoaded) return null;
 
   return (
     <ScreenWrapper>
-      <TouchableOpacity  style={styles.userIcon} onPress={() => navigation.openDrawer()}>
-        <Icon name="home" type="material" color="#000" size={30} />
-      </TouchableOpacity>
-
       <View style={styles.container}>
-        <Text style={styles.titulo}>Buscar Planta</Text>
-
-        <View style={styles.searchContainer}>
-          <TextInput style={styles.input} placeholder="Busca" value={busca} onChangeText={setBusca} onSubmitEditing={buscarPlantas} />
-          <TouchableOpacity onPress={buscarPlantas} style={styles.botaoBuscar}>
-            <Text style={styles.botaoBuscarTexto}>Buscar</Text>
+        {/* Ícone do usuário + barra de busca */}
+        <View style={styles.searchRow}>
+          <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.iconUserContainer}>
+            <Ionicons name="person-circle-outline" color="#6B4226" size={40} />
           </TouchableOpacity>
+
+          <View style={styles.searchBox}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar planta"
+              value={busca}
+              onChangeText={setBusca}
+              onSubmitEditing={buscarPlantas}
+              returnKeyType="search"
+            />
+            <TouchableOpacity onPress={buscarPlantas} style={styles.searchIcon}>
+              <Ionicons name="search" size={20} color="#6B4226" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {carregando ? (
@@ -103,23 +138,68 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
-  container: { flex: 1, padding: 20 },
-  userIcon: { position: "absolute", top: 10, left: 10, zIndex: 1, width:"30" },
-  titulo: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
-  searchContainer: { flexDirection: "row", marginBottom: 15, alignItems: "center" },
-  input: { flex: 1, borderWidth: 1, borderRadius: 8, padding: 10, marginRight: 10 },
-  botaoBuscar: { backgroundColor: "#4CAF50", paddingVertical: 10, paddingHorizontal: 15, borderRadius: 8 },
-  botaoBuscarTexto: { color: "#fff", fontWeight: "bold" },
+  container: { flex: 1, padding: 20, backgroundColor: "#F9F3F6" },
+
+  // Novo layout do ícone + barra de busca
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  iconUserContainer: {
+    paddingRight: 10,
+  },
+  searchBox: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+  },
+  searchIcon: {
+    paddingLeft: 10,
+  },
+
   linha: { justifyContent: "space-between", marginBottom: 15 },
-  card: { flex: 1, backgroundColor: "#f9f9f9", borderRadius: 10, padding: 10, alignItems: "center", marginHorizontal: 5 },
+  card: {
+    flex: 1,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    padding: 10,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
   imagem: { width: 100, height: 100, borderRadius: 8, marginBottom: 8 },
   nome: { fontWeight: "bold", fontSize: 16, textAlign: "center" },
   nomeCientifico: { fontSize: 12, fontStyle: "italic", color: "#555", textAlign: "center" },
   toxica: { fontSize: 12, color: "red", textAlign: "center", marginTop: 4 },
-  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
-  modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 10, width: "90%", alignItems: "center" },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "90%",
+    alignItems: "center",
+  },
   imagemGrande: { width: 200, height: 200, borderRadius: 10, marginBottom: 10 },
-  botaoFechar: { marginTop: 15, backgroundColor: "#4CAF50", paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8 },
+  botaoFechar: {
+    marginTop: 15,
+    backgroundColor: "#4CAF50",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
   botaoFecharTexto: { color: "#fff", fontWeight: "bold" },
 });
