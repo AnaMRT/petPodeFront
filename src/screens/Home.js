@@ -69,19 +69,17 @@ export default function HomeScreen({ navigation }) {
       style={styles.card}
     >
       <Image source={{ uri: item.imagemUrl }} style={styles.imagem} />
-      <Text style={styles.nome}>{item.nomePopular}</Text>
-      <Text style={styles.nomeCientifico}>{item.nomeCientifico}</Text>
-      <Text style={styles.toxica}>
-        {item.toxicaParaCaninos ? "Tóxica para cães " : ""}
-        {item.toxicaParaFelinos ? "Tóxica para gatos" : ""}
-      </Text>
+      <View style={styles.textBox}>
+        <Text style={styles.nome}>{item.nomePopular}</Text>
+        <Text style={styles.nomeCientifico}>{item.nomeCientifico}</Text>
+      </View>
     </TouchableOpacity>
   );
 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* Ícone do usuário + barra de busca */}
+        {/* 🔍 Ícone + barra de busca */}
         <View style={styles.searchRow}>
           <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.iconUserContainer}>
             <Ionicons name="person-circle-outline" color="#6B4226" size={40} />
@@ -90,7 +88,7 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.searchBox}>
             <TextInput
               style={styles.searchInput}
-              placeholder="Buscar planta"
+              placeholder="BUSCAR PLANTAS"
               value={busca}
               onChangeText={setBusca}
               onSubmitEditing={buscarPlantas}
@@ -102,8 +100,11 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
 
+        {/* ⚠️ Título de alerta acima da lista */}
+        <Text style={styles.alerta}>Cuidado: plantas tóxicas para seus pets!</Text>
+
         {carregando ? (
-          <ActivityIndicator size="large" color="#00aa00" style={{ marginTop: 20 }} />
+          <ActivityIndicator size="large" color="#A3B18A" style={{ marginTop: 20 }} />
         ) : (
           <FlatList
             data={plantas}
@@ -111,10 +112,9 @@ export default function HomeScreen({ navigation }) {
             renderItem={renderItem}
             numColumns={2}
             columnWrapperStyle={styles.linha}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 5 }}
           />
         )}
-
         <Modal visible={modalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -123,11 +123,11 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.nomeCientifico}>{plantaSelecionada?.nomeCientifico}</Text>
               <Text style={{ marginVertical: 10 }}>{plantaSelecionada?.descricao}</Text>
               <Text style={styles.toxica}>
-                {plantaSelecionada?.toxicaParaCaninos ? "Tóxica para cães " : ""}
+                {plantaSelecionada?.toxicaParaCaninos ? "Tóxica para cães\n\ " : ""}
                 {plantaSelecionada?.toxicaParaFelinos ? "Tóxica para gatos" : ""}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.botaoFechar}>
-                <Text style={styles.botaoFecharTexto}>Fechar</Text>
+                <Text style={styles.botaoFecharTexto}>FECHAR</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -138,16 +138,16 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#F9F3F6" },
-
-  // Novo layout do ícone + barra de busca
+  container: { flex: 1, padding: 10, backgroundColor: "#F9F3F6" },
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 50,
+    paddingRight: 10,
   },
   iconUserContainer: {
     paddingRight: 10,
+    paddingLeft: 10,
   },
   searchBox: {
     flex: 1,
@@ -155,31 +155,76 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
+    borderColor: "#2C2C2C",
+    borderRadius: 16,
     paddingHorizontal: 10,
   },
   searchInput: {
     flex: 1,
     height: 40,
+    color: "#6D6D6D",
+    fontFamily: "Nunito_400Regular",
   },
   searchIcon: {
     paddingLeft: 10,
   },
 
-  linha: { justifyContent: "space-between", marginBottom: 15 },
+  alerta: {
+    color: "#D9534F",
+    fontSize: 14,
+    fontFamily: "Nunito_400Regular",
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginLeft: 5,
+    paddingLeft: 10,
+  },
+
+  linha: {
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+
   card: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-    padding: 10,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#A3B18A",
     alignItems: "center",
     marginHorizontal: 5,
   },
-  imagem: { width: 100, height: 100, borderRadius: 8, marginBottom: 8 },
-  nome: { fontWeight: "bold", fontSize: 16, textAlign: "center" },
-  nomeCientifico: { fontSize: 12, fontStyle: "italic", color: "#555", textAlign: "center" },
-  toxica: { fontSize: 12, color: "red", textAlign: "center", marginTop: 4 },
+  imagem: {
+    width: "100%",
+    height: 150,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  textBox: {
+    paddingVertical: 4,
+    alignItems: "center",
+  },
+  nome: {
+    fontWeight: "bold",
+    fontFamily: "Nunito_400Regular",
+    fontSize: 14,
+    textAlign: "center",
+    color: "#2C2C2C",
+    textTransform: "uppercase",
+  },
+  nomeCientifico: {
+    fontSize: 12,
+    fontStyle: "italic",
+    fontFamily: "Nunito_400Regular",
+    color: "#6D6D6D",
+    textAlign: "center",
+    marginTop: 2,
+  },
+  toxica: {
+    fontSize: 12,
+    color: "#D9534F",
+    textAlign: "center",
+    marginTop: 4,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -187,19 +232,24 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: "#F9F3F6",
     padding: 20,
     borderRadius: 10,
     width: "90%",
     alignItems: "center",
   },
-  imagemGrande: { width: 200, height: 200, borderRadius: 10, marginBottom: 10 },
+  imagemGrande: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
   botaoFechar: {
     marginTop: 15,
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#6B4226",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
-  botaoFecharTexto: { color: "#fff", fontWeight: "bold" },
+  botaoFecharTexto: { color: "#fff",  fontFamily: "Nunito_400Regular", fontWeight: "bold",},
 });

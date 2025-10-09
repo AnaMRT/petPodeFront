@@ -73,7 +73,7 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor:"#F9F3F6" },
   title: { fontSize: 64, marginBottom: 100, textAlign: "center", fontFamily:"PlayfairDisplay_400Regular", color:"#2C2C2C"},
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 20, fontFamily:"Nunito_400Regular", color:"#6D6D6D"},
+  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 20, fontFamily:"Nunito_400Regular", color:"#6D6D6D", backgroundColor: "#fff"},
   forgot: { color: "#6B4226", textAlign: "right", textDecorationLine: "underline", fontFamily:"Nunito_400Regular"},
   cadastro: { color: "#6B4226", textAlign: "left", textDecorationLine: "underline", fontFamily:"Nunito_400Regular"},
   linhaconta:{marginTop: 2, fontFamily:"Nunito_400Regular"},

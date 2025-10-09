@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { View, Text, Keyboard } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { View, Text } from "react-native";
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
 
 import LoginScreen from "./src/screens/LoginScreen";
@@ -20,26 +20,48 @@ const Drawer = createDrawerNavigator();
 
 function PlanoScreen() {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor:"#F9F3F6" }}>
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F9F3F6" }}>
       <Text>Plano</Text>
     </View>
   );
 }
 
 function TabRoutes() {
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   return (
     <Tab.Navigator
-    initialRouteName="Home"
+      initialRouteName="Home"
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          height: 70,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          borderWidth: 1,
-          backgroundColor: "#F9F3F6",
-          position: "absolute",
-        },
+        tabBarStyle: isKeyboardVisible
+          ? { display: "none" } 
+          : {
+              height: 70,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              borderWidth:1,
+              borderColor: "#A3B18A",
+              backgroundColor: "#F9F3F6",
+              shadowColor: "#000",
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            },
         tabBarActiveTintColor: "#6B4226",
         tabBarInactiveTintColor: "#A3B18A",
       }}
@@ -57,33 +79,26 @@ function TabRoutes() {
         name="Home"
         component={Home}
         options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={24} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={24} color={color} />,
         }}
       />
       <Tab.Screen
         name="Pets"
         component={PetsScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="paw" size={24} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <FontAwesome5 name="paw" size={24} color={color} />,
         }}
       />
       <Tab.Screen
         name="Favoritos"
         component={PlantasFavsScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="star-outline" size={24} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Ionicons name="star-outline" size={24} color={color} />,
         }}
       />
     </Tab.Navigator>
   );
 }
-
 
 function DrawerRoutes() {
   return (

@@ -54,7 +54,7 @@ export default function RegisterScreenPet({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor:"#F9F3F6" },
   title: { fontSize: 64, marginBottom: 100, textAlign: "center", fontFamily:"PlayfairDisplay_400Regular", color:"#2C2C2C"},
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 20, fontFamily:"Nunito_400Regular", color:"#6D6D6D"},
+  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 20, fontFamily:"Nunito_400Regular", color:"#6D6D6D", backgroundColor: "#fff",},
   pickerContainer: {borderWidth: 1, marginBottom: 10, borderRadius: 20, fontFamily:"Nunito_400Regular", color:"#6D6D6D"},
   picker: { fontFamily:"Nunito_400Regular", color:"#6D6D6D" },
   button:{ backgroundColor:"#6B4226", fontFamily:"Nunito_400Regular" },
