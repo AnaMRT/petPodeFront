@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { Ionicons } from "@expo/vector-icons";
+import { UserContext } from "../context/UserContext"; // 👈 importa o contexto do usuário
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -22,6 +23,8 @@ export default function HomeScreen({ navigation }) {
   const [carregando, setCarregando] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [plantaSelecionada, setPlantaSelecionada] = useState(null);
+
+  const { userPhoto } = useContext(UserContext); // 👈 obtém a foto do usuário do contexto
 
   useEffect(() => {
     carregarPlantas();
@@ -33,7 +36,7 @@ export default function HomeScreen({ navigation }) {
       const response = await api.get("/plantas");
       setPlantas(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao carregar plantas:", error);
     } finally {
       setCarregando(false);
     }
@@ -54,7 +57,7 @@ export default function HomeScreen({ navigation }) {
       });
       setPlantas(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Erro na busca:", error);
     } finally {
       setCarregando(false);
     }
@@ -79,16 +82,24 @@ export default function HomeScreen({ navigation }) {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* 🔍 Ícone + barra de busca */}
+        {/* 🔍 Barra de busca + imagem do usuário */}
         <View style={styles.searchRow}>
           <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.iconUserContainer}>
-            <Ionicons name="person-circle-outline" color="#6B4226" size={40} />
+            <Image
+              source={
+                userPhoto
+                  ? { uri: userPhoto }
+                  : require("../../assets/user-placeholder.png")
+              }
+              style={styles.userPhoto}
+            />
           </TouchableOpacity>
 
           <View style={styles.searchBox}>
             <TextInput
               style={styles.searchInput}
               placeholder="BUSCAR PLANTAS"
+              placeholderTextColor="#999"
               value={busca}
               onChangeText={setBusca}
               onSubmitEditing={buscarPlantas}
@@ -100,9 +111,10 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
 
-        {/* ⚠️ Título de alerta acima da lista */}
-        <Text style={styles.alerta}>Cuidado: plantas tóxicas para seus pets!</Text>
+        {/* ⚠️ Alerta */}
+        <Text style={styles.alerta}>Cuidado: algumas plantas podem ser tóxicas para seus pets!</Text>
 
+        {/* 🌿 Lista de plantas */}
         {carregando ? (
           <ActivityIndicator size="large" color="#A3B18A" style={{ marginTop: 20 }} />
         ) : (
@@ -115,17 +127,21 @@ export default function HomeScreen({ navigation }) {
             contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 5 }}
           />
         )}
-        <Modal visible={modalVisible} animationType="slide" transparent={true}>
+
+        {/* 🌸 Modal de detalhes */}
+        <Modal visible={modalVisible} animationType="fade" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Image source={{ uri: plantaSelecionada?.imagemUrl }} style={styles.imagemGrande} />
               <Text style={styles.nome}>{plantaSelecionada?.nomePopular}</Text>
               <Text style={styles.nomeCientifico}>{plantaSelecionada?.nomeCientifico}</Text>
-              <Text style={{ marginVertical: 10 }}>{plantaSelecionada?.descricao}</Text>
+              <Text style={styles.descricao}>{plantaSelecionada?.descricao}</Text>
+
               <Text style={styles.toxica}>
-                {plantaSelecionada?.toxicaParaCaninos ? "Tóxica para cães\n\ " : ""}
-                {plantaSelecionada?.toxicaParaFelinos ? "Tóxica para gatos" : ""}
+                {plantaSelecionada?.toxicaParaCaninos ? "🐶 Tóxica para cães\n" : ""}
+                {plantaSelecionada?.toxicaParaFelinos ? "🐱 Tóxica para gatos" : ""}
               </Text>
+
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.botaoFechar}>
                 <Text style={styles.botaoFecharTexto}>FECHAR</Text>
               </TouchableOpacity>
@@ -138,16 +154,23 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10, backgroundColor: "#F9F3F6" },
+  container: { flex: 1, padding: 15, backgroundColor: "#F9F3F6" },
+
+  // 🔍 Barra de busca
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 50,
-    paddingRight: 10,
+    marginBottom: 30,
   },
   iconUserContainer: {
     paddingRight: 10,
-    paddingLeft: 10,
+  },
+  userPhoto: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#A3B18A",
   },
   searchBox: {
     flex: 1,
@@ -155,52 +178,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#2C2C2C",
+    borderColor: "#A3B18A",
     borderRadius: 16,
     paddingHorizontal: 10,
   },
   searchInput: {
     flex: 1,
     height: 40,
-    color: "#6D6D6D",
+    color: "#333",
     fontFamily: "Nunito_400Regular",
   },
   searchIcon: {
     paddingLeft: 10,
   },
 
+  // ⚠️ Alerta
   alerta: {
     color: "#D9534F",
     fontSize: 14,
-    fontFamily: "Nunito_400Regular",
     fontWeight: "bold",
-    marginBottom: 10,
-    marginLeft: 5,
-    paddingLeft: 10,
+    marginBottom: 15,
+    textAlign: "center",
   },
 
+  // 🌿 Lista
   linha: {
     justifyContent: "space-between",
     marginBottom: 15,
   },
-
   card: {
     flex: 1,
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 10,
     borderColor: "#A3B18A",
     alignItems: "center",
     marginHorizontal: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   imagem: {
     width: "100%",
     height: 150,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   textBox: {
-    paddingVertical: 4,
+    paddingVertical: 8,
     alignItems: "center",
   },
   nome: {
@@ -219,12 +245,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 2,
   },
-  toxica: {
-    fontSize: 12,
-    color: "#D9534F",
-    textAlign: "center",
-    marginTop: 4,
-  },
+
+  // 🌸 Modal
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -232,24 +254,40 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    backgroundColor: "#F9F3F6",
+    backgroundColor: "#fff",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 12,
     width: "90%",
     alignItems: "center",
   },
   imagemGrande: {
-    width: 200,
-    height: 200,
-    borderRadius: 10,
+    width: 220,
+    height: 220,
+    borderRadius: 12,
     marginBottom: 10,
+  },
+  descricao: {
+    fontSize: 14,
+    textAlign: "center",
+    marginVertical: 10,
+    color: "#333",
+  },
+  toxica: {
+    fontSize: 13,
+    color: "#D9534F",
+    textAlign: "center",
+    marginTop: 4,
   },
   botaoFechar: {
     marginTop: 15,
     backgroundColor: "#6B4226",
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 25,
     borderRadius: 8,
   },
-  botaoFecharTexto: { color: "#fff",  fontFamily: "Nunito_400Regular", fontWeight: "bold",},
+  botaoFecharTexto: {
+    color: "#fff",
+    fontFamily: "Nunito_400Regular",
+    fontWeight: "bold",
+  },
 });
