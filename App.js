@@ -18,6 +18,8 @@ import ResetSenhaScreen from "./src/screens/ResetSenhaScreen";
 import PetsScreen from "./src/screens/PetsScreen";
 import PlantasFavsScreen from "./src/screens/PlantasFavsScreen";
 import Home from "./src/screens/Home";
+import EditarPetScreen from "./src/screens/EditarPetScreen";
+import EditarPerfilScreen from "./src/screens/EditarPerfilScreen";
 
 // 🔹 Contextos
 import { UserProvider } from "./src/context/UserContext";
@@ -25,7 +27,7 @@ import { PetsProvider } from "./src/context/PetsContext";
 
 // 🔹 Drawer customizado (com foto, galeria, câmera e avatares)
 import CustomDrawerContent from "./src/components/CustomDrawerContent";
-import EditarPetScreen from "./src/screens/EditarPetScreen";
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -135,9 +137,7 @@ function DrawerRoutes() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="Home" component={TabRoutes} />
-      <Drawer.Screen name="Meus Pets" component={PetsScreen} />
-      <Drawer.Screen name="Plantas Favoritas" component={PlantasFavsScreen} />
-      <Drawer.Screen name="Plano" component={PlanoScreen} />
+      <Drawer.Screen name="Editar Perfil" component={EditarPerfilScreen} />
     </Drawer.Navigator>
   );
 }
@@ -157,6 +157,7 @@ export default function App() {
             <Stack.Screen name="Cadastro de Pets" component={RegisterScreenPet}/>
             <Stack.Screen name="PetsScreen" component={PetsScreen}/>
             <Stack.Screen name="EditarPetScreen" component={EditarPetScreen}/>
+            <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen}/>
             <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} />
             <Stack.Screen name="Home" component={DrawerRoutes} />
           </Stack.Navigator>

@@ -1,12 +1,15 @@
 import React, { useState, useContext } from "react";
-import { View, Image, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
+import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { UserContext } from "../context/UserContext";
 import PhotoPickerModal from "./PhotoPickerModal";
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CustomDrawerContent() {
   const { userPhoto, setUserPhoto } = useContext(UserContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -38,6 +41,14 @@ export default function CustomDrawerContent() {
     setModalVisible(false);
   };
 
+  // Botão de logout: apenas redireciona para tela de login
+  const handleLogout = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "LoginScreen" }],
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -53,8 +64,21 @@ export default function CustomDrawerContent() {
           <Text style={styles.changeText}>Alterar Foto</Text>
         </TouchableOpacity>
 
-        {/* Linha de separação agora com espaçamento */}
         <View style={styles.separator} />
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate("EditarPerfilScreen")}
+        >
+          <Text style={styles.menuText}>👤 Editar Perfil</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Botão de logout no final do drawer */}
+      <View style={styles.footerContainer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.logoutText}>🚪 Sair</Text>
+        </TouchableOpacity>
       </View>
 
       <PhotoPickerModal
@@ -75,8 +99,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9F3F6",
   },
   headerContainer: {
-    alignItems: "center", // garante que a foto não encoste na borda do celular
-    paddingBottom: 40, // espaçamento entre foto e linha
+    alignItems: "center",
+    paddingBottom: 40,
   },
   photoContainer: {
     alignItems: "center",
@@ -98,5 +122,32 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#A3B18A",
     marginTop: 20,
+  },
+  menuItem: {
+    paddingVertical: 15,
+    borderBottomColor: "#E4D9D1",
+    borderBottomWidth: 1,
+  },
+  menuText: {
+    fontSize: 16,
+    color: "#6B4226",
+    fontFamily: "Nunito_400Regular",
+  },
+  footerContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 30,
+  },
+  logoutButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    backgroundColor: "#E07A5F",
+    borderRadius: 25,
+  },
+  logoutText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

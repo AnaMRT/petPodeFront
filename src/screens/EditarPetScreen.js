@@ -1,21 +1,24 @@
 import React, { useState } from "react";
 import {
+  View,
   Text,
   StyleSheet,
   TextInput,
   Alert,
   ScrollView,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ScreenWrapper from "../components/ScreenWrapper";
 import api from "../../api";
 
 export default function EditarPetScreen({ route, navigation }) {
-  const { pet } = route.params;
-  const [nome, setNome] = useState(pet.nome);
-  const [especie, setEspecie] = useState(pet.especie || "");
+  const { pet } = route.params; // Recebe o pet passado pela tela anterior
 
+  // Estados iniciais com os dados do pet
+  const [nome, setNome] = useState(pet?.nome || "");
+  const [especie, setEspecie] = useState(pet?.especie || "");
 
   const handleSave = async () => {
     if (!nome.trim()) {
@@ -25,21 +28,35 @@ export default function EditarPetScreen({ route, navigation }) {
     try {
       const token = await AsyncStorage.getItem("token");
 
+      if (!token) {
+        return Alert.alert("Erro", "Token de autenticação não encontrado.");
+      }
+
       const payload = {
         nome,
         especie,
       };
 
-      await api.put(`/pet/${pet.id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
+      console.log("[EditarPetScreen] Payload enviado:", payload);
+
+      // 🔹 Endpoint correto do backend (singular /pet)
+      const response = await api.put(`/pet/${pet.id}`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      Alert.alert("Sucesso", "Pet atualizado com sucesso!", [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
+      Alert.alert(
+        "Sucesso",
+        `Pet atualizado: ${response.data.nome} (${response.data.especie})`,
+        [{ text: "OK", onPress: () => navigation.goBack() }]
+      );
     } catch (error) {
-      console.error("[handleSave] Erro:", error);
-      Alert.alert("Erro", "Não foi possível atualizar o pet.");
+      console.error(
+        "[EditarPetScreen] Erro ao atualizar pet:",
+        error.response?.data || error
+      );
+      Alert.alert("Erro", "Não foi possível atualizar o pet. Tente novamente.");
     }
   };
 
@@ -47,6 +64,8 @@ export default function EditarPetScreen({ route, navigation }) {
     <ScreenWrapper>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Editar Pet</Text>
+
+        {/* Nome */}
         <Text style={styles.label}>Nome</Text>
         <TextInput
           value={nome}
@@ -55,13 +74,22 @@ export default function EditarPetScreen({ route, navigation }) {
           placeholder="Digite o nome do pet"
         />
 
+        {/* Espécie */}
         <Text style={styles.label}>Espécie</Text>
-        <TextInput
-          value={especie}
-          onChangeText={setEspecie}
-          style={styles.input}
-          placeholder="Ex.: Cachorro, Gato"
-        />
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={especie}
+            onValueChange={(value) => setEspecie(value)}
+            style={styles.picker}
+            prompt="Selecione a espécie"
+          >
+            <Picker.Item label="Selecione a espécie" value="" />
+            <Picker.Item label="Canino" value="canino" />
+            <Picker.Item label="Felino" value="felino" />
+          </Picker>
+        </View>
+
+        {/* Botão salvar */}
         <Button
           title="SALVAR"
           onPress={handleSave}
@@ -111,5 +139,15 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    marginBottom: 16,
+    backgroundColor: "#fff",
+  },
+  picker: {
+    color: "#6B4226",
   },
 });
