@@ -70,14 +70,14 @@ export default function CustomDrawerContent() {
           style={styles.menuItem}
           onPress={() => navigation.navigate("EditarPerfilScreen")}
         >
-          <Text style={styles.menuText}>👤 Editar Perfil</Text>
+          <Text style={styles.menuText}>Editar Perfil</Text>
         </TouchableOpacity>
       </View>
 
       {/* Botão de logout no final do drawer */}
       <View style={styles.footerContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.logoutText}>🚪 Sair</Text>
+          <Text style={styles.logoutText}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
 
@@ -110,44 +110,38 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: "#A3B18A",
+    borderColor: "#6B4226",
   },
   changeText: {
     marginTop: 10,
-    color: "#6B4226",
+    color: "#2C2C2C",
     fontWeight: "600",
+    fontSize: 14,
+    fontFamily:"Nunito_400Regular",
   },
   separator: {
     width: "80%",
     height: 1,
-    backgroundColor: "#A3B18A",
+    backgroundColor: "#6B4226",
     marginTop: 20,
   },
   menuItem: {
     paddingVertical: 15,
-    borderBottomColor: "#E4D9D1",
-    borderBottomWidth: 1,
   },
   menuText: {
     fontSize: 16,
-    color: "#6B4226",
+    color: "#2C2C2C",
     fontFamily: "Nunito_400Regular",
   },
   footerContainer: {
     flex: 1,
     justifyContent: "flex-end",
-    alignItems: "center",
     paddingBottom: 30,
-  },
-  logoutButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    backgroundColor: "#E07A5F",
-    borderRadius: 25,
+    alignItems: "center",
   },
   logoutText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: "#2C2C2C",
     fontSize: 16,
+    fontFamily: "Nunito_400Regular",
   },
 });

@@ -112,7 +112,7 @@ export default function HomeScreen({ navigation }) {
         </View>
 
         {/* ⚠️ Alerta */}
-        <Text style={styles.alerta}>Cuidado: algumas plantas podem ser tóxicas para seus pets!</Text>
+        <Text style={styles.alerta}>Cuidado: plantas tóxicas para seus pets!</Text>
 
         {/* 🌿 Lista de plantas */}
         {carregando ? (
@@ -138,8 +138,8 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.descricao}>{plantaSelecionada?.descricao}</Text>
 
               <Text style={styles.toxica}>
-                {plantaSelecionada?.toxicaParaCaninos ? "🐶 Tóxica para cães\n" : ""}
-                {plantaSelecionada?.toxicaParaFelinos ? "🐱 Tóxica para gatos" : ""}
+                {plantaSelecionada?.toxicaParaCaninos ? "Tóxica para cães\n" : ""}
+                {plantaSelecionada?.toxicaParaFelinos ? " Tóxica para gatos" : ""}
               </Text>
 
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.botaoFechar}>
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#A3B18A",
+    borderColor: "#6B4226",
   },
   searchBox: {
     flex: 1,
@@ -178,14 +178,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#A3B18A",
+    borderColor: "#2C2C2C",
     borderRadius: 16,
     paddingHorizontal: 10,
   },
   searchInput: {
     flex: 1,
     height: 40,
-    color: "#333",
+    color: "#6D6D6D",
     fontFamily: "Nunito_400Regular",
   },
   searchIcon: {
@@ -196,42 +196,34 @@ const styles = StyleSheet.create({
   alerta: {
     color: "#D9534F",
     fontSize: 14,
-    fontWeight: "bold",
     marginBottom: 15,
-    textAlign: "center",
+    marginLeft: 15,
+    fontFamily: "Nunito_700Bold",
   },
 
   // 🌿 Lista
   linha: {
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: 10,
   },
   card: {
     flex: 1,
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderRadius: 10,
     borderColor: "#A3B18A",
     alignItems: "center",
     marginHorizontal: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   imagem: {
     width: "100%",
     height: 150,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
   },
   textBox: {
-    paddingVertical: 8,
+    paddingVertical: 5,
     alignItems: "center",
   },
   nome: {
-    fontWeight: "bold",
-    fontFamily: "Nunito_400Regular",
+    fontFamily: "Nunito_700Bold",
     fontSize: 14,
     textAlign: "center",
     color: "#2C2C2C",
@@ -270,13 +262,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     marginVertical: 10,
-    color: "#333",
+    color: "#2C2C2C",
+    fontFamily:"Nunito_400Regular",
   },
   toxica: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#D9534F",
     textAlign: "center",
     marginTop: 4,
+    fontFamily:"Nunito_700bold",
   },
   botaoFechar: {
     marginTop: 15,
@@ -287,7 +281,6 @@ const styles = StyleSheet.create({
   },
   botaoFecharTexto: {
     color: "#fff",
-    fontFamily: "Nunito_400Regular",
-    fontWeight: "bold",
+    fontFamily: "Nunito_700Bold",
   },
 });

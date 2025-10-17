@@ -90,6 +90,7 @@ export default function PetsScreen({ navigation }) {
 
   return (
     <ScreenWrapper>
+      <Text style={styles.titulo}>MEUS PETS</Text>
       <View style={styles.container}>
         {pets.length === 0 ? (
           <>
@@ -116,7 +117,7 @@ export default function PetsScreen({ navigation }) {
                     onPress={abrirCadastroPet}
                     style={[styles.petCard, styles.addCard]}
                   >
-                    <Text style={styles.addText}>＋ Adicionar</Text>
+                    <Text style={styles.addText}>＋ Adicionar pet</Text>
                   </TouchableOpacity>
                 ) : (
                   <View style={styles.petCard}>
@@ -193,14 +194,6 @@ export default function PetsScreen({ navigation }) {
                 />
               </View>
             </Modal>
-
-            {/* Botão fixo de cadastrar pet */}
-            <Button
-              title="CADASTRAR PET"
-              onPress={abrirCadastroPet}
-              buttonStyle={styles.addButton}
-              titleStyle={styles.buttonText}
-            />
           </>
         )}
       </View>
@@ -210,6 +203,13 @@ export default function PetsScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 20, backgroundColor: "#F9F3F6" },
+  titulo:{
+    fontSize: 40,
+    color:"#2C2C2C",
+    textAlign:"center",
+    marginBottom: 20,
+    fontFamily:"PlayfairDisplay_700Bold"
+  },
   message: {
     fontSize: 18,
     fontWeight: "bold",
@@ -222,20 +222,16 @@ const styles = StyleSheet.create({
     width: CARD_SIZE,
     height: CARD_SIZE + 40,
     backgroundColor: "#fff",
-    borderRadius: 16,
     alignItems: "center",
     justifyContent: "flex-start",
     position: "relative",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#A3B18A",
   },
   petImage: {
     width: CARD_SIZE,
-    height: CARD_SIZE,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    height: CARD_SIZE, 
+    backgroundColor:"#C4C4C4",
   },
   petName: {
     marginTop: 8,
