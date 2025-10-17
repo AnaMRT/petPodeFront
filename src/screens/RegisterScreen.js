@@ -61,9 +61,9 @@ export default function RegisterScreen({ navigation }) {
         </View>
 
         <Button
-          title="CADASTRO"
+          title="CADASTRAR"
           onPress={handleRegister}
-          buttonStyle={{ backgroundColor: "#6B4226", borderRadius: 20, padding: 14, marginTop: 10, marginBottom: 10 }}
+          buttonStyle={{ backgroundColor: "#6B4226", borderRadius: 20, padding: 14, marginTop: 10, marginBottom: 10, color: "#6D6D6D" }}
           titleStyle={{ fontSize: 18, fontFamily: "Nunito_400Regular" }}
         />
       </View>

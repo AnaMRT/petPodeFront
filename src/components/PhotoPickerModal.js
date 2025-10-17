@@ -39,11 +39,11 @@ export default function PhotoPickerModal({
 
           <View style={styles.options}>
             <TouchableOpacity onPress={onPickGallery} style={styles.button}>
-              <Text style={styles.optionText}>📁 Escolher da Galeria</Text>
+              <Text style={styles.optionText}>Escolher da Galeria</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={onPickCamera} style={styles.button}>
-              <Text style={styles.optionText}>📷 Tirar uma Foto</Text>
+              <Text style={styles.optionText}>Tirar uma Foto</Text>
             </TouchableOpacity>
           </View>
 
