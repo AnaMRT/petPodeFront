@@ -2,14 +2,16 @@ import React, { useState, useContext } from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
+  TextInput,
   Alert,
   ScrollView,
 } from "react-native";
+import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ScreenWrapper from "../components/ScreenWrapper";
 import { UserContext } from "../context/UserContext";
+import api from "../../api";
 
 export default function EditarPerfilScreen({ navigation }) {
   const { user, setUser } = useContext(UserContext);
@@ -21,12 +23,11 @@ export default function EditarPerfilScreen({ navigation }) {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSalvar = async () => {
+  const handleSave = async () => {
     if (!nome && !email && !novaSenha) {
       return Alert.alert("Aviso", "Nenhum campo foi alterado.");
     }
 
-    // Validação da senha
     if (novaSenha || confirmarSenha) {
       if (!senhaAntiga) {
         return Alert.alert("Erro", "Digite sua senha atual para alterá-la.");
@@ -39,7 +40,8 @@ export default function EditarPerfilScreen({ navigation }) {
     setLoading(true);
 
     try {
-      const token = await AsyncStorage.getItem("token"); // JWT salvo no login
+      const token = await AsyncStorage.getItem("token");
+
       if (!token) {
         setLoading(false);
         return Alert.alert("Erro", "Usuário não autenticado.");
@@ -48,32 +50,29 @@ export default function EditarPerfilScreen({ navigation }) {
       const payload = {};
       if (nome !== user?.nome) payload.nome = nome;
       if (email !== user?.email) payload.email = email;
-      if (novaSenha) payload.senha = novaSenha;
-
-      console.log("Payload enviado:", payload);
-
-      const response = await fetch("http://SEU_IP:8080/usuario", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Erro na resposta:", errorText);
-        throw new Error("Falha ao atualizar perfil");
+      if (novaSenha) {
+        payload.senha = novaSenha;
+        payload.senhaAtual = senhaAntiga; 
       }
 
-      const usuarioAtualizado = await response.json();
-      setUser(usuarioAtualizado);
+      console.log("[EditarPerfilScreen] Payload enviado:", payload);
 
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-      navigation.goBack();
+      const response = await api.put("/usuario", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser(response.data);
+
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
     } catch (error) {
-      console.error("[EditarPerfil] Erro:", error);
+      console.error(
+        "[EditarPerfilScreen] Erro ao atualizar perfil:",
+        error.response?.data || error.message || error
+      );
       Alert.alert("Erro", "Não foi possível atualizar o perfil.");
     } finally {
       setLoading(false);
@@ -81,77 +80,74 @@ export default function EditarPerfilScreen({ navigation }) {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 40 }}
-    >
-      <Text style={styles.title}>Editar Perfil</Text>
+    <ScreenWrapper>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Editar Perfil</Text>
 
-      <Text style={styles.label}>Nome</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Seu nome"
-        value={nome}
-        onChangeText={setNome}
-      />
+        <Text style={styles.label}>Nome</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Seu nome"
+          value={nome}
+          onChangeText={setNome}
+        />
 
-      <Text style={styles.label}>E-mail</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="seuemail@exemplo.com"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+        <Text style={styles.label}>E-mail</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="seuemail@exemplo.com"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <Text style={styles.sectionTitle}>Alterar Senha (opcional)</Text>
+        <Text style={styles.sectionTitle}>Alterar Senha (opcional)</Text>
 
-      <Text style={styles.label}>Senha Atual</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite sua senha atual"
-        secureTextEntry
-        value={senhaAntiga}
-        onChangeText={setSenhaAntiga}
-      />
+        <Text style={styles.label}>Senha Atual</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite sua senha atual"
+          secureTextEntry
+          value={senhaAntiga}
+          onChangeText={setSenhaAntiga}
+        />
 
-      <Text style={styles.label}>Nova Senha</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite a nova senha"
-        secureTextEntry
-        value={novaSenha}
-        onChangeText={setNovaSenha}
-      />
+        <Text style={styles.label}>Nova Senha</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite a nova senha"
+          secureTextEntry
+          value={novaSenha}
+          onChangeText={setNovaSenha}
+        />
 
-      <Text style={styles.label}>Confirmar Nova Senha</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Confirme a nova senha"
-        secureTextEntry
-        value={confirmarSenha}
-        onChangeText={setConfirmarSenha}
-      />
+        <Text style={styles.label}>Confirmar Nova Senha</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirme a nova senha"
+          secureTextEntry
+          value={confirmarSenha}
+          onChangeText={setConfirmarSenha}
+        />
 
-      <TouchableOpacity
-        style={[styles.button, loading && { opacity: 0.7 }]}
-        onPress={handleSalvar}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? "Salvando..." : "Salvar Alterações"}
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <Button
+          title={loading ? "Salvando..." : "Salvar Alterações"}
+          onPress={handleSave}
+          disabled={loading}
+          buttonStyle={styles.saveButton}
+          titleStyle={styles.saveButtonText}
+        />
+      </ScrollView>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#F9F3F6",
     padding: 20,
+    backgroundColor: "#F9F3F6",
+    flexGrow: 1,
   },
   title: {
     fontSize: 24,
@@ -161,9 +157,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   label: {
-    color: "#6B4226",
     marginBottom: 6,
+    color: "#6B4226",
     fontWeight: "600",
+    fontSize: 14,
   },
   sectionTitle: {
     marginTop: 25,
@@ -177,19 +174,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#A3B18A",
     borderRadius: 10,
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     marginBottom: 15,
+    fontSize: 14,
   },
-  button: {
+  saveButton: {
     backgroundColor: "#6B4226",
+    borderRadius: 20,
     paddingVertical: 14,
-    borderRadius: 10,
     marginTop: 10,
   },
-  buttonText: {
+  saveButtonText: {
     color: "#fff",
-    textAlign: "center",
     fontWeight: "700",
-    fontSize: 16,
   },
 });

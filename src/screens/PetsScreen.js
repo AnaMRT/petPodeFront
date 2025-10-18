@@ -9,6 +9,7 @@ import {
   Image,
   Modal,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Button } from "react-native-elements";
@@ -23,6 +24,7 @@ export default function PetsScreen({ navigation }) {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPetImage, setSelectedPetImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const fetchPets = async () => {
     try {
@@ -44,35 +46,78 @@ export default function PetsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  const handleDelete = async (petId) => {
+  // Função para upload da imagem no Cloudinary
+  const uploadImageToCloudinary = async (uri) => {
+    const data = new FormData();
+    data.append("file", {
+      uri,
+      type: "image/jpeg",
+      name: "upload.jpg",
+    });
+    data.append("upload_preset", "unsigned_preset"); // ajuste para seu preset
+
     try {
-      const token = await AsyncStorage.getItem("token");
-      await api.delete(`/pet/${petId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPets((prev) => prev.filter((p) => p.id !== petId));
-      Alert.alert("Sucesso", "Pet removido com sucesso!");
+      setUploading(true);
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dovcmli9p/image/upload",
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+      const json = await response.json();
+      setUploading(false);
+
+      if (json.secure_url) {
+        return json.secure_url;
+      } else {
+        Alert.alert("Erro", "Não foi possível fazer upload da imagem.");
+        return null;
+      }
     } catch (error) {
-      console.error("[handleDelete]", error);
-      Alert.alert("Erro", "Não foi possível remover o pet.");
+      setUploading(false);
+      Alert.alert("Erro", "Falha no upload da imagem.");
+      return null;
     }
   };
 
-  const handleEdit = (pet) => {
-    navigation.navigate("EditarPetScreen", { pet });
-  };
-
   const handleChangePhoto = async (pet) => {
-    const result = await ImagePicker.launchImageLibraryAsync({
+    // Escolher imagem da galeria
+    let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.7,
     });
+
     if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setPets((prev) =>
-        prev.map((p) => (p.id === pet.id ? { ...p, foto: uri } : p))
-      );
+      const imageUri = result.assets[0].uri;
+
+      // Upload imagem para Cloudinary
+      const imagemUrl = await uploadImageToCloudinary(imageUri);
+      if (!imagemUrl) return;
+
+      try {
+        const token = await AsyncStorage.getItem("token");
+
+        // Chamar backend para atualizar imagem do pet
+        await api.put(
+          `/pet/${pet.id}/imagem`,
+          null,
+          {
+            params: { imagemUrl },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        // Atualizar estado local para refletir a nova imagem
+        setPets((prev) =>
+          prev.map((p) => (p.id === pet.id ? { ...p, foto: imagemUrl } : p))
+        );
+        Alert.alert("Sucesso", "Imagem do pet atualizada!");
+      } catch (error) {
+        console.error("[handleChangePhoto]", error);
+        Alert.alert("Erro", "Não foi possível atualizar a imagem do pet.");
+      }
     }
   };
 
@@ -110,7 +155,10 @@ export default function PetsScreen({ navigation }) {
               data={[...pets, { id: "new", isNew: true }]}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
-              columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 20 }}
+              columnWrapperStyle={{
+                justifyContent: "space-between",
+                marginBottom: 20,
+              }}
               renderItem={({ item }) =>
                 item.isNew ? (
                   <TouchableOpacity
@@ -194,6 +242,14 @@ export default function PetsScreen({ navigation }) {
                 />
               </View>
             </Modal>
+
+            {uploading && (
+              <ActivityIndicator
+                size="large"
+                color="#6B4226"
+                style={{ position: "absolute", top: "50%", left: "50%" }}
+              />
+            )}
           </>
         )}
       </View>

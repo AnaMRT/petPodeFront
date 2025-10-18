@@ -27,6 +27,7 @@ import { PetsProvider } from "./src/context/PetsContext";
 
 // 🔹 Drawer customizado (com foto, galeria, câmera e avatares)
 import CustomDrawerContent from "./src/components/CustomDrawerContent";
+import InfosScreen from "./src/screens/InfosScreen";
 
 
 const Stack = createStackNavigator();
@@ -160,6 +161,7 @@ export default function App() {
             <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen}/>
             <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} />
             <Stack.Screen name="Home" component={DrawerRoutes} />
+              <Stack.Screen name="InfosScreen" component={InfosScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PetsProvider>

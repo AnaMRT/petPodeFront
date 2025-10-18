@@ -75,11 +75,17 @@ export default function CustomDrawerContent() {
       </View>
 
       {/* Botão de logout no final do drawer */}
-      <View style={styles.footerContainer}>
+      <View style={styles.alinhadorContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.logoutText}>LOG OUT</Text>
+          <Text style={styles.menuText}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
+        <View style={styles.alinhadorContainer}>
+        <TouchableOpacity  onPress={() => navigation.navigate("InfosScreen")}>
+          <Text >Help</Text>
+        </TouchableOpacity>
+      </View>
+      
 
       <PhotoPickerModal
         visible={modalVisible}
@@ -139,9 +145,8 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     alignItems: "center",
   },
-  logoutText: {
-    color: "#2C2C2C",
-    fontSize: 16,
-    fontFamily: "Nunito_400Regular",
+  alinhadorContainer: {
+    paddingLeft: 70,
   },
+  
 });
