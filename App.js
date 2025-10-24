@@ -9,6 +9,7 @@ import {
   FontAwesome5,
   Ionicons,
 } from "@expo/vector-icons";
+import { AuthProvider } from "./src/context/AuthContext";
 
 // 🔹 Telas
 import LoginScreen from "./src/screens/LoginScreen";
@@ -144,27 +145,30 @@ function DrawerRoutes() {
 }
 
 // 🔹 App principal (com providers)
+
 export default function App() {
   return (
-    <UserProvider>
-      <PetsProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Login"
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Cadastro" component={RegisterScreen} />
-            <Stack.Screen name="Cadastro de Pets" component={RegisterScreenPet}/>
-            <Stack.Screen name="PetsScreen" component={PetsScreen}/>
-            <Stack.Screen name="EditarPetScreen" component={EditarPetScreen}/>
-            <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen}/>
-            <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} />
-            <Stack.Screen name="Home" component={DrawerRoutes} />
+    <AuthProvider>
+      <UserProvider>
+        <PetsProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName="Login"
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Cadastro" component={RegisterScreen} />
+              <Stack.Screen name="Cadastro de Pets" component={RegisterScreenPet} />
+              <Stack.Screen name="PetsScreen" component={PetsScreen} />
+              <Stack.Screen name="EditarPetScreen" component={EditarPetScreen} />
+              <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen} />
+              <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} />
+              <Stack.Screen name="Home" component={DrawerRoutes} />
               <Stack.Screen name="InfosScreen" component={InfosScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </PetsProvider>
-    </UserProvider>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </PetsProvider>
+      </UserProvider>
+    </AuthProvider>
   );
 }

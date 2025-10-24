@@ -15,7 +15,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { Ionicons } from "@expo/vector-icons";
-import { UserContext } from "../context/UserContext"; // 👈 importa o contexto do usuário
+import { UserContext } from "../context/UserContext";
+import { AuthContext } from "../context/AuthContext"; 
+import PlantCard from "../components/PlantCard";
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -23,13 +25,16 @@ export default function HomeScreen({ navigation }) {
   const [carregando, setCarregando] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [plantaSelecionada, setPlantaSelecionada] = useState(null);
+  const [favoritosIds, setFavoritosIds] = useState([]);
 
-  const { userPhoto } = useContext(UserContext); // 👈 obtém a foto do usuário do contexto
+  const { userPhoto } = useContext(UserContext);
 
   useEffect(() => {
     carregarPlantas();
+    carregarFavoritos();
   }, []);
 
+  // 🔹 Carrega todas as plantas
   const carregarPlantas = async () => {
     try {
       setCarregando(true);
@@ -42,6 +47,21 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  // 🔹 Carrega os favoritos do usuário
+  const carregarFavoritos = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await api.get("/favoritos", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const ids = response.data.map((p) => p.id);
+      setFavoritosIds(ids);
+    } catch (error) {
+      console.error("Erro ao carregar favoritos:", error);
+    }
+  };
+
+  // 🔹 Buscar plantas
   const buscarPlantas = async () => {
     Keyboard.dismiss();
     if (!busca.trim()) {
@@ -63,20 +83,37 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  // ⭐ Alternar favorito
+  const handleToggleFavorite = async (plantaId, isFavorito) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (isFavorito) {
+        await api.post(`/favoritos/${plantaId}`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavoritosIds((prev) => [...prev, plantaId]);
+      } else {
+        await api.delete(`/favoritos/${plantaId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar favorito:", error);
+    }
+  };
+
+  // 🌿 Renderiza cada planta
   const renderItem = ({ item }) => (
-    <TouchableOpacity
+    <PlantCard
+      planta={item}
       onPress={() => {
         setPlantaSelecionada(item);
         setModalVisible(true);
       }}
-      style={styles.card}
-    >
-      <Image source={{ uri: item.imagemUrl }} style={styles.imagem} />
-      <View style={styles.textBox}>
-        <Text style={styles.nome}>{item.nomePopular}</Text>
-        <Text style={styles.nomeCientifico}>{item.nomeCientifico}</Text>
-      </View>
-    </TouchableOpacity>
+      isFavorite={favoritosIds.includes(item.id)}
+      onToggleFavorite={handleToggleFavorite}
+    />
   );
 
   return (
@@ -84,7 +121,10 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.container}>
         {/* 🔍 Barra de busca + imagem do usuário */}
         <View style={styles.searchRow}>
-          <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.iconUserContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+            style={styles.iconUserContainer}
+          >
             <Image
               source={
                 userPhoto
@@ -120,7 +160,7 @@ export default function HomeScreen({ navigation }) {
         ) : (
           <FlatList
             data={plantas}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={renderItem}
             numColumns={2}
             columnWrapperStyle={styles.linha}
@@ -132,19 +172,55 @@ export default function HomeScreen({ navigation }) {
         <Modal visible={modalVisible} animationType="fade" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Image source={{ uri: plantaSelecionada?.imagemUrl }} style={styles.imagemGrande} />
-              <Text style={styles.nome}>{plantaSelecionada?.nomePopular}</Text>
-              <Text style={styles.nomeCientifico}>{plantaSelecionada?.nomeCientifico}</Text>
-              <Text style={styles.descricao}>{plantaSelecionada?.descricao}</Text>
+              {plantaSelecionada && (
+                <>
+                  <Image
+                    source={{ uri: plantaSelecionada.imagemUrl }}
+                    style={styles.imagemGrande}
+                  />
 
-              <Text style={styles.toxica}>
-                {plantaSelecionada?.toxicaParaCaninos ? "Tóxica para cães\n" : ""}
-                {plantaSelecionada?.toxicaParaFelinos ? " Tóxica para gatos" : ""}
-              </Text>
+                  {/* ⭐ Estrela dentro do modal */}
+                  <TouchableOpacity
+                    style={styles.modalStar}
+                    onPress={() =>
+                      handleToggleFavorite(
+                        plantaSelecionada.id,
+                        !favoritosIds.includes(plantaSelecionada.id)
+                      )
+                    }
+                  >
+                    <Ionicons
+                      name={
+                        favoritosIds.includes(plantaSelecionada.id)
+                          ? "star"
+                          : "star-outline"
+                      }
+                      size={26}
+                      color="#FFB200"
+                    />
+                  </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.botaoFechar}>
-                <Text style={styles.botaoFecharTexto}>FECHAR</Text>
-              </TouchableOpacity>
+                  <Text style={styles.nome}>{plantaSelecionada.nomePopular}</Text>
+                  <Text style={styles.nomeCientifico}>
+                    {plantaSelecionada.nomeCientifico}
+                  </Text>
+                  <Text style={styles.descricao}>
+                    {plantaSelecionada.descricao}
+                  </Text>
+
+                  <Text style={styles.toxica}>
+                    {plantaSelecionada.toxicaParaCaninos ? "Tóxica para cães\n" : ""}
+                    {plantaSelecionada.toxicaParaFelinos ? "Tóxica para gatos" : ""}
+                  </Text>
+
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(false)}
+                    style={styles.botaoFechar}
+                  >
+                    <Text style={styles.botaoFecharTexto}>FECHAR</Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </View>
         </Modal>
@@ -156,7 +232,6 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15, backgroundColor: "#F9F3F6" },
 
-  // 🔍 Barra de busca
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -192,7 +267,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 
-  // ⚠️ Alerta
   alerta: {
     color: "#D9534F",
     fontSize: 14,
@@ -201,26 +275,61 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito_700Bold",
   },
 
-  // 🌿 Lista
   linha: {
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  card: {
+
+  modalContainer: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
     backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#A3B18A",
+    padding: 20,
+    borderRadius: 12,
+    width: "90%",
     alignItems: "center",
-    marginHorizontal: 5,
+    position: "relative",
   },
-  imagem: {
-    width: "100%",
-    height: 150,
+  modalStar: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    zIndex: 5,
   },
-  textBox: {
-    paddingVertical: 5,
-    alignItems: "center",
+  imagemGrande: {
+    width: 220,
+    height: 220,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  descricao: {
+    fontSize: 14,
+    textAlign: "center",
+    marginVertical: 10,
+    color: "#2C2C2C",
+    fontFamily: "Nunito_400Regular",
+  },
+  toxica: {
+    fontSize: 14,
+    color: "#D9534F",
+    textAlign: "center",
+    marginTop: 4,
+    fontFamily: "Nunito_700Bold",
+  },
+  botaoFechar: {
+    marginTop: 15,
+    backgroundColor: "#6B4226",
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+  },
+  botaoFecharTexto: {
+    color: "#fff",
+    fontFamily: "Nunito_700Bold",
   },
   nome: {
     fontFamily: "Nunito_700Bold",
@@ -236,51 +345,5 @@ const styles = StyleSheet.create({
     color: "#6D6D6D",
     textAlign: "center",
     marginTop: 2,
-  },
-
-  // 🌸 Modal
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
-    width: "90%",
-    alignItems: "center",
-  },
-  imagemGrande: {
-    width: 220,
-    height: 220,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-  descricao: {
-    fontSize: 14,
-    textAlign: "center",
-    marginVertical: 10,
-    color: "#2C2C2C",
-    fontFamily:"Nunito_400Regular",
-  },
-  toxica: {
-    fontSize: 14,
-    color: "#D9534F",
-    textAlign: "center",
-    marginTop: 4,
-    fontFamily:"Nunito_700bold",
-  },
-  botaoFechar: {
-    marginTop: 15,
-    backgroundColor: "#6B4226",
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-  },
-  botaoFecharTexto: {
-    color: "#fff",
-    fontFamily: "Nunito_700Bold",
   },
 });

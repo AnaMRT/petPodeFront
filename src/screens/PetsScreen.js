@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,18 +16,22 @@ import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ScreenWrapper from "../components/ScreenWrapper";
 import api from "../../api";
+import { PetsContext } from "../context/PetsContext";
 
 const { width } = Dimensions.get("window");
 const CARD_SIZE = (width - 60) / 2;
 
 export default function PetsScreen({ navigation }) {
-  const [pets, setPets] = useState([]);
+  const { pets, setPets } = useContext(PetsContext);
   const [loading, setLoading] = useState(true);
+  const [carregando, setCarregando] = useState(true);
   const [selectedPetImage, setSelectedPetImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
+  // Carrega pets do backend
   const fetchPets = async () => {
     try {
+      setLoading(true);
       const token = await AsyncStorage.getItem("token");
       const response = await api.get("/pet", {
         headers: { Authorization: `Bearer ${token}` },
@@ -46,34 +50,27 @@ export default function PetsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  // Função para upload da imagem no Cloudinary
+  // Upload de imagem para Cloudinary
   const uploadImageToCloudinary = async (uri) => {
-    const data = new FormData();
-    data.append("file", {
+    const formData = new FormData();
+    formData.append("file", {
       uri,
       type: "image/jpeg",
       name: "upload.jpg",
     });
-    data.append("upload_preset", "unsigned_preset"); // ajuste para seu preset
+    formData.append("upload_preset", "unsigned_preset");
 
     try {
       setUploading(true);
-      const response = await fetch(
+      const response = await api.post(
         "https://api.cloudinary.com/v1_1/dovcmli9p/image/upload",
-        {
-          method: "POST",
-          body: data,
-        }
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
-      const json = await response.json();
       setUploading(false);
-
-      if (json.secure_url) {
-        return json.secure_url;
-      } else {
-        Alert.alert("Erro", "Não foi possível fazer upload da imagem.");
-        return null;
-      }
+      if (response.data.secure_url) return response.data.secure_url;
+      Alert.alert("Erro", "Não foi possível fazer upload da imagem.");
+      return null;
     } catch (error) {
       setUploading(false);
       Alert.alert("Erro", "Falha no upload da imagem.");
@@ -82,37 +79,33 @@ export default function PetsScreen({ navigation }) {
   };
 
   const handleChangePhoto = async (pet) => {
-    // Escolher imagem da galeria
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.7,
+      quality: 1,
     });
 
     if (!result.canceled) {
       const imageUri = result.assets[0].uri;
-
-      // Upload imagem para Cloudinary
       const imagemUrl = await uploadImageToCloudinary(imageUri);
       if (!imagemUrl) return;
 
       try {
         const token = await AsyncStorage.getItem("token");
+        await api.put(`/pet/${pet.id}/imagem`, null, {
+          params: { imagemUrl },
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        // Chamar backend para atualizar imagem do pet
-        await api.put(
-          `/pet/${pet.id}/imagem`,
-          null,
-          {
-            params: { imagemUrl },
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        // Atualizar estado local para refletir a nova imagem
         setPets((prev) =>
           prev.map((p) => (p.id === pet.id ? { ...p, foto: imagemUrl } : p))
         );
+
+        const storedPets = JSON.stringify(
+          pets.map((p) => (p.id === pet.id ? { ...p, foto: imagemUrl } : p))
+        );
+        await AsyncStorage.setItem("pets", storedPets);
+
         Alert.alert("Sucesso", "Imagem do pet atualizada!");
       } catch (error) {
         console.error("[handleChangePhoto]", error);
@@ -121,24 +114,42 @@ export default function PetsScreen({ navigation }) {
     }
   };
 
-  const abrirCadastroPet = () => {
-    navigation.navigate("Cadastro de Pets");
+  const handleDelete = async (petId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await api.delete(`/pet/${petId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPets((prev) => prev.filter((p) => p.id !== petId));
+      Alert.alert("Sucesso", "Pet removido!");
+    } catch (error) {
+      console.error("[handleDelete]", error);
+      Alert.alert("Erro", "Não foi possível remover o pet.");
+    }
   };
 
-  if (loading) {
-    return (
-      <ScreenWrapper>
-        <Text style={styles.message}>Carregando seus pets...</Text>
-      </ScreenWrapper>
-    );
-  }
+  const abrirCadastroPet = () => navigation.navigate("Cadastro de Pets");
+  const abrirEditarPet = (pet) =>
+    navigation.navigate("EditarPetScreen", { pet });
+
+  if (loading)
+    if (carregando) {
+        return (
+          <ScreenWrapper>
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#A3B18A" />
+              <Text style={styles.loadingText}>Carregando pets...</Text>
+            </View>
+          </ScreenWrapper>
+        );
+      }
 
   return (
     <ScreenWrapper>
       <Text style={styles.titulo}>MEUS PETS</Text>
       <View style={styles.container}>
         {pets.length === 0 ? (
-          <>
+          <View style={styles.emptyContainer}>
             <Text style={styles.message}>
               Ops... você ainda não possui pets cadastrados!
             </Text>
@@ -148,7 +159,7 @@ export default function PetsScreen({ navigation }) {
               buttonStyle={styles.addButton}
               titleStyle={styles.buttonText}
             />
-          </>
+          </View>
         ) : (
           <>
             <FlatList
@@ -186,31 +197,25 @@ export default function PetsScreen({ navigation }) {
                       />
                     </TouchableOpacity>
 
-                    {/* Ícone de delete */}
                     <TouchableOpacity
                       style={styles.deleteIcon}
                       onPress={() =>
-                        Alert.alert(
-                          "Confirmar Exclusão",
-                          "Deseja excluir este pet?",
-                          [
-                            { text: "Cancelar", style: "cancel" },
-                            {
-                              text: "Excluir",
-                              style: "destructive",
-                              onPress: () => handleDelete(item.id),
-                            },
-                          ]
-                        )
+                        Alert.alert("Confirmar Exclusão", "Deseja excluir este pet?", [
+                          { text: "Cancelar", style: "cancel" },
+                          {
+                            text: "Excluir",
+                            style: "destructive",
+                            onPress: () => handleDelete(item.id),
+                          },
+                        ])
                       }
                     >
                       <Text style={styles.deleteText}>✕</Text>
                     </TouchableOpacity>
 
-                    {/* Ícone de editar */}
                     <TouchableOpacity
                       style={styles.editIcon}
-                      onPress={() => handleEdit(item)}
+                      onPress={() => abrirEditarPet(item)}
                     >
                       <Text style={styles.editText}>✎</Text>
                     </TouchableOpacity>
@@ -221,7 +226,6 @@ export default function PetsScreen({ navigation }) {
               }
             />
 
-            {/* Modal de imagem */}
             <Modal
               visible={!!selectedPetImage}
               transparent
@@ -247,7 +251,13 @@ export default function PetsScreen({ navigation }) {
               <ActivityIndicator
                 size="large"
                 color="#6B4226"
-                style={{ position: "absolute", top: "50%", left: "50%" }}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginLeft: -12,
+                  marginTop: -12,
+                }}
               />
             )}
           </>
@@ -258,20 +268,43 @@ export default function PetsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, paddingTop: 20, backgroundColor: "#F9F3F6" },
-  titulo:{
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    backgroundColor: "#F9F3F6",
+  },
+  titulo: {
     fontSize: 40,
-    color:"#2C2C2C",
-    textAlign:"center",
+    color: "#2C2C2C",
+    textAlign: "center",
     marginBottom: 20,
-    fontFamily:"PlayfairDisplay_700Bold"
+    fontFamily: "PlayfairDisplay_700Bold",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
   message: {
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
     color: "#6B4226",
+    fontFamily: "Nunito_400Regular",
+    marginBottom: 30,
+  },
+  addButton: {
+    backgroundColor: "#6B4226",
+    borderRadius: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    alignSelf: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
     fontFamily: "Nunito_400Regular",
   },
   petCard: {
@@ -286,8 +319,8 @@ const styles = StyleSheet.create({
   },
   petImage: {
     width: CARD_SIZE,
-    height: CARD_SIZE, 
-    backgroundColor:"#C4C4C4",
+    height: CARD_SIZE,
+    backgroundColor: "#C4C4C4",
   },
   petName: {
     marginTop: 8,
@@ -304,20 +337,7 @@ const styles = StyleSheet.create({
     borderColor: "#A3B18A",
     backgroundColor: "#fff9f6",
   },
-  addText: {
-    fontSize: 16,
-    color: "#6B4226",
-    fontWeight: "bold",
-  },
-  addButton: {
-    backgroundColor: "#6B4226",
-    borderRadius: 20,
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    alignSelf: "center",
-    marginTop: 20,
-  },
-  buttonText: { color: "#fff", fontWeight: "bold", fontFamily: "Nunito_400Regular" },
+  addText: { fontSize: 16, color: "#6B4226", fontWeight: "bold" },
   modalContainer: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.9)",
@@ -343,7 +363,7 @@ const styles = StyleSheet.create({
   editIcon: {
     position: "absolute",
     top: 6,
-    left: 6, // canto oposto do delete
+    left: 6,
     backgroundColor: "rgba(0,0,0,0.3)",
     width: 24,
     height: 24,
@@ -352,9 +372,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 10,
   },
-  editText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
+  editText: { color: "white", fontWeight: "bold", fontSize: 16 },
+
+  // NOVOS ESTILOS PARA CARREGAMENTO
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    color: "#6B4226",
+    fontFamily: "Nunito_400Regular",
+    marginTop: 10,
   },
 });

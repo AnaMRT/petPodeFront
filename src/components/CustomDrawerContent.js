@@ -5,12 +5,15 @@ import { UserContext } from "../context/UserContext";
 import PhotoPickerModal from "./PhotoPickerModal";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AuthContext } from "../context/AuthContext"; // 👈 IMPORTANTE
+import { CommonActions } from "@react-navigation/native"; // 👈 usado no reset
 
 export default function CustomDrawerContent() {
   const { userPhoto, setUserPhoto } = useContext(UserContext);
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
-
+  const { logout } = useContext(AuthContext); // 👈 pega função do contexto
+  
   const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -41,12 +44,15 @@ export default function CustomDrawerContent() {
     setModalVisible(false);
   };
 
-  // Botão de logout: apenas redireciona para tela de login
-  const handleLogout = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "LoginScreen" }],
-    });
+  // 👇 Novo método de logout completo
+  const handleLogout = async () => {
+    await logout(); // remove token e reseta estado global
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "Login" }], // 👈 nome da tela de login no seu Stack
+      })
+    );
   };
 
   return (
@@ -68,24 +74,23 @@ export default function CustomDrawerContent() {
 
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate("EditarPerfilScreen")}
-        >
+          onPress={() => navigation.navigate("EditarPerfilScreen")}>
           <Text style={styles.menuText}>Editar Perfil</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Botão de logout no final do drawer */}
+      {/* 👇 Botão de logout atualizado */}
       <View style={styles.alinhadorContainer}>
-        <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate("Login")}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.menuText}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
-        <View style={styles.alinhadorContainer}>
-        <TouchableOpacity  onPress={() => navigation.navigate("InfosScreen")}>
-          <Text >Help</Text>
+
+      <View style={styles.alinhadorContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate("InfosScreen")}>
+          <Text>Help</Text>
         </TouchableOpacity>
       </View>
-      
 
       <PhotoPickerModal
         visible={modalVisible}
@@ -150,3 +155,4 @@ const styles = StyleSheet.create({
   },
   
 });
+

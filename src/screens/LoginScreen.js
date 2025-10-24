@@ -1,25 +1,52 @@
-import React, { useState } from "react"; 
-import { useFonts } from "expo-font"; 
-import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium, PlayfairDisplay_600SemiBold, PlayfairDisplay_700Bold, } from "@expo-google-fonts/playfair-display"; 
-import { Nunito_400Regular, Nunito_500Medium, Nunito_600SemiBold, Nunito_700Bold, } 
-from "@expo-google-fonts/nunito"; import { Button } from "react-native-elements"; 
-import { View, TextInput, Text, StyleSheet, Alert, TouchableOpacity } from "react-native"; 
-import AsyncStorage from "@react-native-async-storage/async-storage"; import api from "../../api"; 
+import React, { useState, useContext } from "react"; // 👈 corrigido
+import { useFonts } from "expo-font";
+import {
+  PlayfairDisplay_400Regular,
+  PlayfairDisplay_500Medium,
+  PlayfairDisplay_600SemiBold,
+  PlayfairDisplay_700Bold,
+} from "@expo-google-fonts/playfair-display";
+import {
+  Nunito_400Regular,
+  Nunito_500Medium,
+  Nunito_600SemiBold,
+  Nunito_700Bold,
+} from "@expo-google-fonts/nunito";
+import { Button } from "react-native-elements";
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
+import { AuthContext } from "../context/AuthContext"; // 👈 IMPORTANTE
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [senhaVisivel, setSenhaVisivel] = useState(false); // controla a visibilidade da senha
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
+  const { login } = useContext(AuthContext); // 👈 pega o login() do contexto
 
   const handleLogin = async () => {
     try {
       const response = await api.post("/auth/login", { email, senha });
       const token = response.data.token;
+
       await AsyncStorage.setItem("token", token);
       Alert.alert("Login OK");
       navigation.navigate("Home");
+      await login(token); // 👈 salva e atualiza o estado global
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
     } catch (error) {
       Alert.alert("Erro", "Email ou senha incorretos.");
     }
@@ -39,7 +66,16 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  const [fontsLoaded] = useFonts({ PlayfairDisplay_400Regular, PlayfairDisplay_500Medium, PlayfairDisplay_600SemiBold, PlayfairDisplay_700Bold, Nunito_400Regular, Nunito_500Medium, Nunito_600SemiBold, Nunito_700Bold, }); 
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_500Medium,
+    PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_700Bold,
+    Nunito_400Regular,
+    Nunito_500Medium,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+  });
   if (!fontsLoaded) return null;
 
   return (
@@ -58,13 +94,13 @@ export default function LoginScreen({ navigation }) {
           <TextInput
             style={{ flex: 1 }}
             placeholder="SENHA"
-            secureTextEntry={!senhaVisivel} // alterna entre true e false
+            secureTextEntry={!senhaVisivel}
             value={senha}
             onChangeText={setSenha}
           />
           <TouchableOpacity onPress={() => setSenhaVisivel(!senhaVisivel)}>
             <Ionicons
-              name={senhaVisivel ? "eye" : "eye-off"} // eye aberto ou fechado
+              name={senhaVisivel ? "eye" : "eye-off"}
               size={24}
               color="#6B4226"
             />
@@ -78,13 +114,22 @@ export default function LoginScreen({ navigation }) {
         <Button
           title="LOGIN"
           onPress={handleLogin}
-          buttonStyle={{ backgroundColor: "#6B4226", borderRadius: 20, padding: 14, marginTop: 10, marginBottom: 10 }}
+          buttonStyle={{
+            backgroundColor: "#6B4226",
+            borderRadius: 20,
+            padding: 14,
+            marginTop: 10,
+            marginBottom: 10,
+          }}
           titleStyle={{ fontSize: 18, fontFamily: "Nunito_400Regular" }}
         />
 
-        <TouchableOpacity onPress={() => navigation.navigate("Cadastro")} style={styles.flexDirection}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Cadastro")}
+          style={styles.flexDirection}
+        >
           <Text style={styles.linhaconta}>Não possui uma conta?</Text>
-          <Text style={styles.cadastro}>Cadastre-se.</Text>
+          <Text style={styles.cadastro}> Cadastre-se.</Text>
         </TouchableOpacity>
       </View>
     </ScreenWrapper>
@@ -99,5 +144,5 @@ const styles = StyleSheet.create({
   forgot: { color: "#6B4226", textAlign: "right", textDecorationLine: "underline", fontFamily: "Nunito_400Regular" },
   cadastro: { color: "#6B4226", textAlign: "left", textDecorationLine: "underline", fontFamily: "Nunito_400Regular" },
   linhaconta: { marginTop: 2, fontFamily: "Nunito_400Regular" },
-  flexDirection: { flexDirection: "row" }
+  flexDirection: { flexDirection: "row" },
 });
