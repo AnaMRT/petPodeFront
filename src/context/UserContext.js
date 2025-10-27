@@ -1,48 +1,35 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../api"; // ajuste o caminho conforme seu projeto
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({
-    nome: "Usuário",
-    email: "usuario@exemplo.com",
-    senha: "123456",
-  });
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
-  const [userPhoto, setUserPhotoState] = useState(null);
-
-  // Função para atualizar o estado e salvar no AsyncStorage
-  const setUserPhoto = async (url) => {
+  const fetchUser = async () => {
     try {
-      setUserPhotoState(url);
-      if (url) {
-        await AsyncStorage.setItem("userPhoto", url);
-      } else {
-        await AsyncStorage.removeItem("userPhoto");
-      }
+      setLoadingUser(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+      const response = await api.get("/usuario/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(response.data);
     } catch (error) {
-      console.error("Erro ao salvar userPhoto no AsyncStorage:", error);
+      console.error("[fetchUser]", error);
+    } finally {
+      setLoadingUser(false);
     }
   };
 
-  // Carregar a foto do AsyncStorage quando o componente montar
   useEffect(() => {
-    const carregarUserPhoto = async () => {
-      try {
-        const url = await AsyncStorage.getItem("userPhoto");
-        if (url) {
-          setUserPhotoState(url);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar userPhoto do AsyncStorage:", error);
-      }
-    };
-    carregarUserPhoto();
+    fetchUser();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser, userPhoto, setUserPhoto }}>
+    <UserContext.Provider value={{ user, setUser, fetchUser, loadingUser }}>
       {children}
     </UserContext.Provider>
   );

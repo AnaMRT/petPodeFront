@@ -1,28 +1,74 @@
-import React, { useState, useContext } from "react";
-import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useContext, useEffect } from "react";
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { UserContext } from "../context/UserContext";
 import PhotoPickerModal from "./PhotoPickerModal";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AuthContext } from "../context/AuthContext"; // 👈 IMPORTANTE
-import { CommonActions } from "@react-navigation/native"; // 👈 usado no reset
+import { AuthContext } from "../context/AuthContext";
+import api from "../../api"; 
+import { atualizarImagemUsuario } from "../service/AtualizarImagemUsuario";
 
 export default function CustomDrawerContent() {
-  const { userPhoto, setUserPhoto } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-  const { logout } = useContext(AuthContext); // 👈 pega função do contexto
-  
+  const { logout } = useContext(AuthContext);
+  const [fetchingUser, setFetchingUser] = useState(true);
+
+  const fetchUser = async () => {
+    try {
+      setFetchingUser(true);
+      const token = await AsyncStorage.getItem("token");
+      const response = await api.get("/user/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(response.data);
+    } catch (error) {
+      console.error("[fetchUser]", error);
+    } finally {
+      setFetchingUser(false);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", fetchUser);
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleUpload = async (uri) => {
+    try {
+      setLoading(true);
+      const imagemUrl = await atualizarImagemUsuario(uri); // Salva no backend
+      setUser((prev) => ({ ...prev, imagemUrl })); // Atualiza no contexto
+      Alert.alert("Sucesso", "Imagem atualizada!");
+    } catch (error) {
+      console.error("[handleUpload]", error);
+      Alert.alert("Erro", "Não foi possível atualizar a imagem.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.8,
     });
     if (!result.canceled) {
-      setUserPhoto(result.assets[0].uri);
+      const uri = result.assets[0].uri;
       setModalVisible(false);
+      await handleUpload(uri);
     }
   };
 
@@ -30,56 +76,73 @@ export default function CustomDrawerContent() {
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.8,
     });
     if (!result.canceled) {
-      setUserPhoto(result.assets[0].uri);
+      const uri = result.assets[0].uri;
       setModalVisible(false);
+      await handleUpload(uri);
     }
   };
 
-  const handleAvatarSelect = (avatar) => {
+  const handleAvatarSelect = async (avatar) => {
     const uri = Image.resolveAssetSource(avatar).uri;
-    setUserPhoto(uri);
     setModalVisible(false);
+    await handleUpload(uri);
   };
 
-  // 👇 Novo método de logout completo
   const handleLogout = async () => {
-    await logout(); // remove token e reseta estado global
+    await logout();
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "Login" }], // 👈 nome da tela de login no seu Stack
+        routes: [{ name: "Login" }],
       })
     );
   };
 
+  if (fetchingUser) {
+    return (
+      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+        <ActivityIndicator size="large" color="#6B4226" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.photoContainer}>
-          <Image
-            source={
-              userPhoto
-                ? { uri: userPhoto }
-                : require("../../assets/user-placeholder.png")
-            }
-            style={styles.photo}
-          />
-          <Text style={styles.changeText}>Alterar Foto</Text>
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={styles.photoContainer}
+        >
+          {loading ? (
+            <ActivityIndicator size="large" color="#6B4226" />
+          ) : (
+            <>
+              <Image
+                source={
+                  user?.imagemUrl
+                    ? { uri: user.imagemUrl }
+                    : require("../../assets/user-placeholder.png")
+                }
+                style={styles.photo}
+              />
+              <Text style={styles.changeText}>Alterar Foto</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <View style={styles.separator} />
 
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate("EditarPerfilScreen")}>
+          onPress={() => navigation.navigate("EditarPerfilScreen")}
+        >
           <Text style={styles.menuText}>Editar Perfil</Text>
         </TouchableOpacity>
       </View>
 
-      {/* 👇 Botão de logout atualizado */}
       <View style={styles.alinhadorContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.menuText}>LOG OUT</Text>
@@ -105,54 +168,13 @@ export default function CustomDrawerContent() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F9F3F6",
-  },
-  headerContainer: {
-    alignItems: "center",
-    paddingBottom: 40,
-  },
-  photoContainer: {
-    alignItems: "center",
-  },
-  photo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: "#6B4226",
-  },
-  changeText: {
-    marginTop: 10,
-    color: "#2C2C2C",
-    fontWeight: "600",
-    fontSize: 14,
-    fontFamily:"Nunito_400Regular",
-  },
-  separator: {
-    width: "80%",
-    height: 1,
-    backgroundColor: "#6B4226",
-    marginTop: 20,
-  },
-  menuItem: {
-    paddingVertical: 15,
-  },
-  menuText: {
-    fontSize: 16,
-    color: "#2C2C2C",
-    fontFamily: "Nunito_400Regular",
-  },
-  footerContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    paddingBottom: 30,
-    alignItems: "center",
-  },
-  alinhadorContainer: {
-    paddingLeft: 70,
-  },
-  
+  container: { flex: 1, backgroundColor: "#F9F3F6" },
+  headerContainer: { alignItems: "center", paddingBottom: 40 },
+  photoContainer: { alignItems: "center" },
+  photo: { width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: "#6B4226" },
+  changeText: { marginTop: 10, color: "#2C2C2C", fontWeight: "600", fontSize: 14, fontFamily: "Nunito_400Regular" },
+  separator: { width: "80%", height: 1, backgroundColor: "#6B4226", marginTop: 20 },
+  menuItem: { paddingVertical: 15 },
+  menuText: { fontSize: 16, color: "#2C2C2C", fontFamily: "Nunito_400Regular" },
+  alinhadorContainer: { paddingLeft: 70 },
 });
-
