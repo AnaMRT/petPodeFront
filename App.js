@@ -21,6 +21,7 @@ import PlantasFavsScreen from "./src/screens/PlantasFavsScreen";
 import Home from "./src/screens/Home";
 import EditarPetScreen from "./src/screens/EditarPetScreen";
 import EditarPerfilScreen from "./src/screens/EditarPerfilScreen";
+import PlanoScreen from "./src/screens/PlanoScreen";
 
 // 🔹 Contextos
 import { UserProvider } from "./src/context/UserContext";
@@ -34,22 +35,6 @@ import InfosScreen from "./src/screens/InfosScreen";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-
-// 🔹 Tela simples do Plano
-function PlanoScreen() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#F9F3F6",
-      }}
-    >
-      <Text>Plano</Text>
-    </View>
-  );
-}
 
 // 🔹 Tabs inferiores
 function TabRoutes() {
@@ -165,6 +150,7 @@ export default function App() {
               <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} />
               <Stack.Screen name="Home" component={DrawerRoutes} />
               <Stack.Screen name="InfosScreen" component={InfosScreen} />
+              <Stack.Screen name="Plano" component={PlanoScreen}/>
             </Stack.Navigator>
           </NavigationContainer>
         </PetsProvider>
