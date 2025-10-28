@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  Alert,
+  View, Text, StyleSheet, FlatList, ActivityIndicator, Alert
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
-import PlantCard from "../components/PlantCard"; // ⬅️ Componente com estrela
+import PlantCard from "../components/PlantCard";
 
 export default function PlantasFavsScreen({ navigation }) {
   const [favoritas, setFavoritas] = useState([]);
+  const [favoritosIds, setFavoritosIds] = useState([]);
   const [carregando, setCarregando] = useState(true);
 
   const carregarFavoritas = async () => {
@@ -26,6 +22,7 @@ export default function PlantasFavsScreen({ navigation }) {
       });
 
       setFavoritas(response.data);
+      setFavoritosIds(response.data.map((p) => p.id));
     } catch (error) {
       console.error("Erro ao carregar favoritas:", error);
       Alert.alert("Erro", "Não foi possível carregar suas plantas favoritas.");
@@ -39,8 +36,30 @@ export default function PlantasFavsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  const removerFavorito = (id) => {
-    setFavoritas((prev) => prev.filter((planta) => planta.id !== id));
+  const handleToggleFavorite = async (plantaId, isFavorito) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (isFavorito) {
+        await api.put(`/favoritos/${plantaId}`, null, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavoritosIds((prev) => [...prev, plantaId]);
+        const planta = favoritas.find((p) => p.id === plantaId);
+        if (planta && !favoritas.includes(planta)) {
+          setFavoritas((prev) => [...prev, planta]);
+        }
+      } else {
+        await api.delete(`/favoritos/${plantaId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
+        setFavoritas((prev) => prev.filter((p) => p.id !== plantaId));
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar favorito:", error);
+      Alert.alert("Erro", "Não foi possível atualizar seus favoritos.");
+    }
   };
 
   if (carregando) {
@@ -74,11 +93,9 @@ export default function PlantasFavsScreen({ navigation }) {
           renderItem={({ item }) => (
             <PlantCard
               planta={item}
-              isFavorite={true}
-              onPress={() =>
-                navigation.navigate("DetalhesPlanta", { planta: item })
-              }
-              onToggleFavorite={(id) => removerFavorito(id)}
+              isFavorite={favoritosIds.includes(item.id)}
+              onPress={() => navigation.navigate("DetalhesPlanta", { planta: item })}
+              onToggleFavorite={handleToggleFavorite}
             />
           )}
         />
@@ -89,10 +106,10 @@ export default function PlantasFavsScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   titulo: {
-    fontSize: 40, 
-    color: "#2C2C2C", 
-    textAlign: "center", 
-    marginBottom: 20, 
+    fontSize: 40,
+    color: "#2C2C2C",
+    textAlign: "center",
+    marginBottom: 20,
     fontFamily: "PlayfairDisplay_700Bold",
   },
   container: {
@@ -120,5 +137,4 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito_400Regular",
     marginTop: 10,
   },
-
 });

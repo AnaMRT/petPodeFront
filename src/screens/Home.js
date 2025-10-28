@@ -1,22 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  ActivityIndicator,
-  Keyboard,
-  Modal,
-  StyleSheet,
+  View, Text, TextInput, TouchableOpacity,
+  FlatList, Image, ActivityIndicator, Keyboard, Modal, StyleSheet
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { Ionicons } from "@expo/vector-icons";
 import { UserContext } from "../context/UserContext";
-import { AuthContext } from "../context/AuthContext"; 
 import PlantCard from "../components/PlantCard";
 
 export default function HomeScreen({ navigation }) {
@@ -34,7 +25,6 @@ export default function HomeScreen({ navigation }) {
     carregarFavoritos();
   }, []);
 
-  // 🔹 Carrega todas as plantas
   const carregarPlantas = async () => {
     try {
       setCarregando(true);
@@ -47,21 +37,18 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // 🔹 Carrega os favoritos do usuário
   const carregarFavoritos = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
       const response = await api.get("/favoritos", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const ids = response.data.map((p) => p.id);
-      setFavoritosIds(ids);
+      setFavoritosIds(response.data.map((p) => p.id));
     } catch (error) {
       console.error("Erro ao carregar favoritos:", error);
     }
   };
 
-  // 🔹 Buscar plantas
   const buscarPlantas = async () => {
     Keyboard.dismiss();
     if (!busca.trim()) {
@@ -83,19 +70,14 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // ⭐ Alternar favorito
   const handleToggleFavorite = async (plantaId, isFavorito) => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (isFavorito) {
-        await api.post(`/favoritos/${plantaId}`, {}, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await api.put(`/favoritos/${plantaId}`, null, { headers: { Authorization: `Bearer ${token}` } });
         setFavoritosIds((prev) => [...prev, plantaId]);
       } else {
-        await api.delete(`/favoritos/${plantaId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await api.delete(`/favoritos/${plantaId}`, { headers: { Authorization: `Bearer ${token}` } });
         setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
       }
     } catch (error) {
@@ -103,7 +85,6 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // 🌿 Renderiza cada planta
   const renderItem = ({ item }) => (
     <PlantCard
       planta={item}
@@ -119,22 +100,14 @@ export default function HomeScreen({ navigation }) {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* 🔍 Barra de busca + imagem do usuário */}
+        {/* Barra de busca e foto do usuário */}
         <View style={styles.searchRow}>
-          <TouchableOpacity
-            onPress={() => navigation.openDrawer()}
-            style={styles.iconUserContainer}
-          >
+          <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.iconUserContainer}>
             <Image
-              source={
-                userPhoto
-                  ? { uri: userPhoto }
-                  : require("../../assets/user-placeholder.png")
-              }
+              source={userPhoto ? { uri: userPhoto } : require("../../assets/user-placeholder.png")}
               style={styles.userPhoto}
             />
           </TouchableOpacity>
-
           <View style={styles.searchBox}>
             <TextInput
               style={styles.searchInput}
@@ -151,10 +124,8 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
 
-        {/* ⚠️ Alerta */}
         <Text style={styles.alerta}>Cuidado: plantas tóxicas para seus pets!</Text>
 
-        {/* 🌿 Lista de plantas */}
         {carregando ? (
           <ActivityIndicator size="large" color="#A3B18A" style={{ marginTop: 20 }} />
         ) : (
@@ -168,18 +139,13 @@ export default function HomeScreen({ navigation }) {
           />
         )}
 
-        {/* 🌸 Modal de detalhes */}
+        {/* Modal de detalhes */}
         <Modal visible={modalVisible} animationType="fade" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               {plantaSelecionada && (
                 <>
-                  <Image
-                    source={{ uri: plantaSelecionada.imagemUrl }}
-                    style={styles.imagemGrande}
-                  />
-
-                  {/* ⭐ Estrela dentro do modal */}
+                  <Image source={{ uri: plantaSelecionada.imagemUrl }} style={styles.imagemGrande} />
                   <TouchableOpacity
                     style={styles.modalStar}
                     onPress={() =>
@@ -190,33 +156,21 @@ export default function HomeScreen({ navigation }) {
                     }
                   >
                     <Ionicons
-                      name={
-                        favoritosIds.includes(plantaSelecionada.id)
-                          ? "star"
-                          : "star-outline"
-                      }
+                      name={favoritosIds.includes(plantaSelecionada.id) ? "star" : "star-outline"}
                       size={26}
                       color="#FFB200"
                     />
                   </TouchableOpacity>
 
                   <Text style={styles.nome}>{plantaSelecionada.nomePopular}</Text>
-                  <Text style={styles.nomeCientifico}>
-                    {plantaSelecionada.nomeCientifico}
-                  </Text>
-                  <Text style={styles.descricao}>
-                    {plantaSelecionada.descricao}
-                  </Text>
-
+                  <Text style={styles.nomeCientifico}>{plantaSelecionada.nomeCientifico}</Text>
+                  <Text style={styles.descricao}>{plantaSelecionada.descricao}</Text>
                   <Text style={styles.toxica}>
                     {plantaSelecionada.toxicaParaCaninos ? "Tóxica para cães\n" : ""}
                     {plantaSelecionada.toxicaParaFelinos ? "Tóxica para gatos" : ""}
                   </Text>
 
-                  <TouchableOpacity
-                    onPress={() => setModalVisible(false)}
-                    style={styles.botaoFechar}
-                  >
+                  <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.botaoFechar}>
                     <Text style={styles.botaoFecharTexto}>FECHAR</Text>
                   </TouchableOpacity>
                 </>
@@ -228,6 +182,9 @@ export default function HomeScreen({ navigation }) {
     </ScreenWrapper>
   );
 }
+
+// O styles permanece igual ao que você já tinha
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15, backgroundColor: "#F9F3F6" },

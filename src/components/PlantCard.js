@@ -1,4 +1,3 @@
-// components/PlantCard.js
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,12 +7,17 @@ import api from "../../api";
 export default function PlantCard({ planta, onPress, isFavorite = false, onToggleFavorite }) {
   const [favorito, setFavorito] = useState(isFavorite);
 
+  useEffect(() => {
+    setFavorito(isFavorite); // Mantém o estado sincronizado ao receber props
+  }, [isFavorite]);
+
   const toggleFavorite = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      const novoEstado = !favorito;
 
-      if (!favorito) {
-        await api.post(`/favoritos/${planta.id}`, null, {
+      if (novoEstado) {
+        await api.put(`/favoritos/${planta.id}`, null, {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
@@ -22,8 +26,8 @@ export default function PlantCard({ planta, onPress, isFavorite = false, onToggl
         });
       }
 
-      setFavorito(!favorito);
-      if (onToggleFavorite) onToggleFavorite(planta.id, !favorito);
+      setFavorito(novoEstado);
+      if (onToggleFavorite) onToggleFavorite(planta.id, novoEstado);
     } catch (error) {
       console.error("Erro ao atualizar favorito:", error);
     }
