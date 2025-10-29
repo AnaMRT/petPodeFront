@@ -33,7 +33,6 @@ export default function EditarPetScreen({ route, navigation }) {
   return (
     <ScreenWrapper>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Editar Pet</Text>
 
         <Text style={styles.label}>Nome</Text>
         <TextInput
@@ -60,7 +59,6 @@ export default function EditarPetScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: "#F9F3F6", flexGrow: 1 },
-  title: { fontSize: 24, fontWeight: "bold", color: "#6B4226", textAlign: "center", marginBottom: 20 },
   label: { marginBottom: 6, color: "#6B4226", fontWeight: "bold", fontSize: 14 },
   input: { backgroundColor: "#fff", borderRadius: 10, padding: 10, marginBottom: 16, borderWidth: 1, borderColor: "#ccc" },
   saveButton: { backgroundColor: "#6B4226", borderRadius: 20, paddingVertical: 14, marginTop: 10 },
