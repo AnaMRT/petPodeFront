@@ -97,6 +97,12 @@ export default function HomeScreen({ navigation }) {
     />
   );
 
+  // 🔹 Aqui criamos uma cópia da lista e adicionamos um item vazio se houver número ímpar
+  const plantasComEspaco = [...plantas];
+  if (plantas.length % 2 !== 0) {
+    plantasComEspaco.push({ id: "vazio" }); // adiciona item “fantasma” para manter o alinhamento
+  }
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -130,9 +136,15 @@ export default function HomeScreen({ navigation }) {
           <ActivityIndicator size="large" color="#A3B18A" style={{ marginTop: 20 }} />
         ) : (
           <FlatList
-            data={plantas}
+            data={plantasComEspaco}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={renderItem}
+            renderItem={({ item }) =>
+              item.id === "vazio" ? (
+                <View style={[styles.cardVazio]} />
+              ) : (
+                renderItem({ item })
+              )
+            }
             numColumns={2}
             columnWrapperStyle={styles.linha}
             contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 5 }}
@@ -183,9 +195,6 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-// O styles permanece igual ao que você já tinha
-
-
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15, backgroundColor: "#F9F3F6" },
 
@@ -235,6 +244,12 @@ const styles = StyleSheet.create({
   linha: {
     justifyContent: "space-between",
     marginBottom: 10,
+  },
+
+  cardVazio: {
+    flex: 1,
+    margin: 5,
+    backgroundColor: "transparent",
   },
 
   modalContainer: {

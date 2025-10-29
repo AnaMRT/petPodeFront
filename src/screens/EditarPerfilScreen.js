@@ -82,7 +82,7 @@ export default function EditarPerfilScreen({ navigation }) {
   return (
     <ScreenWrapper>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Editar Perfil</Text>
+        <Text style={styles.title}>EDITAR PERFIL</Text>
 
         <Text style={styles.label}>Nome</Text>
         <TextInput
@@ -150,15 +150,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#6B4226",
+    fontSize: 40,
+    color: "#2C2C2C",
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: 100,
+    fontFamily: "PlayfairDisplay_700Bold",
   },
   label: {
     marginBottom: 6,
-    color: "#6B4226",
+    color: "#2C2C2C",
     fontWeight: "600",
     fontSize: 14,
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 18,
     fontWeight: "700",
-    color: "#6B4226",
+    color: "##2C2C2C",
   },
   input: {
     backgroundColor: "#fff",
