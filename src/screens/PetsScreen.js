@@ -24,7 +24,6 @@ const CARD_SIZE = (width - 60) / 2;
 export default function PetsScreen({ navigation }) {
   const { pets, setPets } = useContext(PetsContext);
   const [loading, setLoading] = useState(true);
-  const [carregando, setCarregando] = useState(true);
   const [selectedPetImage, setSelectedPetImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
@@ -38,8 +37,8 @@ export default function PetsScreen({ navigation }) {
       });
       setPets(response.data);
     } catch (error) {
-      console.error("[fetchPets] Erro:", error);
       Alert.alert("Erro", "Não foi possível carregar seus pets.");
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -50,67 +49,47 @@ export default function PetsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  // Upload de imagem para Cloudinary
-  const uploadImageToCloudinary = async (uri) => {
-    const formData = new FormData();
-    formData.append("file", {
-      uri,
-      type: "image/jpeg",
-      name: "upload.jpg",
-    });
-    formData.append("upload_preset", "unsigned_preset");
-
-    try {
-      setUploading(true);
-      const response = await api.post(
-        "https://api.cloudinary.com/v1_1/dovcmli9p/image/upload",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      setUploading(false);
-      if (response.data.secure_url) return response.data.secure_url;
-      Alert.alert("Erro", "Não foi possível fazer upload da imagem.");
-      return null;
-    } catch (error) {
-      setUploading(false);
-      Alert.alert("Erro", "Falha no upload da imagem.");
-      return null;
-    }
-  };
-
+  // === ✅ NOVA LÓGICA DE UPLOAD DE IMAGEM (ENVIA DIRETO PARA O BACKEND) ===
   const handleChangePhoto = async (pet) => {
     const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
 
-    if (!result.canceled) {
-      const imageUri = result.assets[0].uri;
-      const imagemUrl = await uploadImageToCloudinary(imageUri);
-      if (!imagemUrl) return;
+    if (result.canceled) return;
 
-      try {
-        const token = await AsyncStorage.getItem("token");
-        await api.put(`/pet/${pet.id}/imagem`, null, {
-          params: { imagemUrl },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    try {
+      setUploading(true);
+      const token = await AsyncStorage.getItem("token");
 
-        setPets((prev) =>
-          prev.map((p) => (p.id === pet.id ? { ...p, foto: imagemUrl } : p))
-        );
+      const formData = new FormData();
+      formData.append("file", {
+        uri: result.assets[0].uri,
+        type: "image/jpeg",
+        name: "foto_pet.jpg",
+      });
 
-        const storedPets = JSON.stringify(
-          pets.map((p) => (p.id === pet.id ? { ...p, foto: imagemUrl } : p))
-        );
-        await AsyncStorage.setItem("pets", storedPets);
+      const response = await api.put(`/pet/${pet.id}/imagem`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-        Alert.alert("Sucesso", "Imagem do pet atualizada!");
-      } catch (error) {
-        console.error("[handleChangePhoto]", error);
-        Alert.alert("Erro", "Não foi possível atualizar a imagem do pet.");
-      }
+      const novaUrl = response.data.imagemUrl;
+
+      setPets((prevPets) =>
+        prevPets.map((p) => (p.id === pet.id ? { ...p, imagemUrl: novaUrl } : p))
+      );
+
+      Alert.alert("Sucesso", "Imagem atualizada!");
+    } catch (error) {
+      console.log("[ERRO AO ATUALIZAR IMAGEM]", error.response?.data || error);
+      Alert.alert("Erro", "Não foi possível atualizar a foto.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -120,11 +99,9 @@ export default function PetsScreen({ navigation }) {
       await api.delete(`/pet/${petId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setPets((prev) => prev.filter((p) => p.id !== petId));
-      Alert.alert("Sucesso", "Pet removido!");
+      setPets((prevPets) => prevPets.filter((p) => p.id !== petId));
     } catch (error) {
-      console.error("[handleDelete]", error);
-      Alert.alert("Erro", "Não foi possível remover o pet.");
+      Alert.alert("Erro", "Não foi possível excluir o pet.");
     }
   };
 
@@ -132,27 +109,28 @@ export default function PetsScreen({ navigation }) {
   const abrirEditarPet = (pet) =>
     navigation.navigate("EditarPetScreen", { pet });
 
-  if (loading)
-    if (carregando) {
-        return (
-          <ScreenWrapper>
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#A3B18A" />
-              <Text style={styles.loadingText}>Carregando pets...</Text>
-            </View>
-          </ScreenWrapper>
-        );
-      }
+  if (loading) {
+    return (
+      <ScreenWrapper>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#A3B18A" />
+          <Text style={styles.loadingText}>Carregando pets...</Text>
+        </View>
+      </ScreenWrapper>
+    );
+  }
 
   return (
     <ScreenWrapper>
       <Text style={styles.titulo}>MEUS PETS</Text>
+
       <View style={styles.container}>
         {pets.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.message}>
               Ops... você ainda não possui pets cadastrados!
             </Text>
+
             <Button
               title="CADASTRAR PET"
               onPress={abrirCadastroPet}
@@ -164,7 +142,7 @@ export default function PetsScreen({ navigation }) {
           <>
             <FlatList
               data={[...pets, { id: "new", isNew: true }]}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               numColumns={2}
               columnWrapperStyle={{
                 justifyContent: "space-between",
@@ -173,8 +151,8 @@ export default function PetsScreen({ navigation }) {
               renderItem={({ item }) =>
                 item.isNew ? (
                   <TouchableOpacity
-                    onPress={abrirCadastroPet}
                     style={[styles.petCard, styles.addCard]}
+                    onPress={abrirCadastroPet}
                   >
                     <Text style={styles.addText}>＋ Adicionar pet</Text>
                   </TouchableOpacity>
@@ -182,37 +160,43 @@ export default function PetsScreen({ navigation }) {
                   <View style={styles.petCard}>
                     <TouchableOpacity
                       onPress={() =>
-                        item.foto
-                          ? setSelectedPetImage(item.foto)
+                        item.imagemUrl
+                          ? setSelectedPetImage(item.imagemUrl)
                           : handleChangePhoto(item)
                       }
                     >
                       <Image
                         source={
-                          item.foto
-                            ? { uri: item.foto }
+                          item.imagemUrl
+                            ? { uri: item.imagemUrl }
                             : require("../../assets/pet-placeholder.png")
                         }
                         style={styles.petImage}
                       />
                     </TouchableOpacity>
 
+                    {/* DELETE */}
                     <TouchableOpacity
                       style={styles.deleteIcon}
                       onPress={() =>
-                        Alert.alert("Confirmar Exclusão", "Deseja excluir este pet?", [
-                          { text: "Cancelar", style: "cancel" },
-                          {
-                            text: "Excluir",
-                            style: "destructive",
-                            onPress: () => handleDelete(item.id),
-                          },
-                        ])
+                        Alert.alert(
+                          "Confirmar Exclusão",
+                          "Deseja excluir este pet?",
+                          [
+                            { text: "Cancelar", style: "cancel" },
+                            {
+                              text: "Excluir",
+                              style: "destructive",
+                              onPress: () => handleDelete(item.id),
+                            },
+                          ]
+                        )
                       }
                     >
                       <Text style={styles.deleteText}>✕</Text>
                     </TouchableOpacity>
 
+                    {/* EDITAR */}
                     <TouchableOpacity
                       style={styles.editIcon}
                       onPress={() => abrirEditarPet(item)}
@@ -226,6 +210,7 @@ export default function PetsScreen({ navigation }) {
               }
             />
 
+            {/* Modal de visualização da imagem */}
             <Modal
               visible={!!selectedPetImage}
               transparent
@@ -373,8 +358,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   editText: { color: "white", fontWeight: "bold", fontSize: 16 },
-
-  // NOVOS ESTILOS PARA CARREGAMENTO
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
