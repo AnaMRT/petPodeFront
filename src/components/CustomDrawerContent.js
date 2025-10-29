@@ -3,17 +3,16 @@ import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { UserContext } from "../context/UserContext";
 import PhotoPickerModal from "./PhotoPickerModal";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
+import { AuthContext } from "../context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AuthContext } from "../context/AuthContext"; // 👈 IMPORTANTE
-import { CommonActions } from "@react-navigation/native"; // 👈 usado no reset
 
 export default function CustomDrawerContent() {
   const { userPhoto, setUserPhoto } = useContext(UserContext);
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
-  const { logout } = useContext(AuthContext); // 👈 pega função do contexto
-  
+  const { logout } = useContext(AuthContext);
+
   const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -21,7 +20,7 @@ export default function CustomDrawerContent() {
       quality: 1,
     });
     if (!result.canceled) {
-      setUserPhoto(result.assets[0].uri);
+      await setUserPhoto(result.assets[0].uri);
       setModalVisible(false);
     }
   };
@@ -33,24 +32,17 @@ export default function CustomDrawerContent() {
       quality: 1,
     });
     if (!result.canceled) {
-      setUserPhoto(result.assets[0].uri);
+      await setUserPhoto(result.assets[0].uri);
       setModalVisible(false);
     }
   };
 
-  const handleAvatarSelect = (avatar) => {
-    const uri = Image.resolveAssetSource(avatar).uri;
-    setUserPhoto(uri);
-    setModalVisible(false);
-  };
-
-  // 👇 Novo método de logout completo
   const handleLogout = async () => {
-    await logout(); // remove token e reseta estado global
+    await logout();
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "Login" }], // 👈 nome da tela de login no seu Stack
+        routes: [{ name: "Login" }],
       })
     );
   };
@@ -60,11 +52,7 @@ export default function CustomDrawerContent() {
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.photoContainer}>
           <Image
-            source={
-              userPhoto
-                ? { uri: userPhoto }
-                : require("../../assets/user-placeholder.png")
-            }
+            source={userPhoto ? { uri: userPhoto } : require("../../assets/user-placeholder.png")}
             style={styles.photo}
           />
           <Text style={styles.changeText}>Alterar Foto</Text>
@@ -72,30 +60,20 @@ export default function CustomDrawerContent() {
 
         <View style={styles.separator} />
 
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate("EditarPerfilScreen")}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("EditarPerfilScreen")}>
           <Text style={styles.menuText}>Editar Perfil</Text>
         </TouchableOpacity>
       </View>
 
-      {/* 👇 Botão de logout atualizado */}
       <View style={styles.alinhadorContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.menuText}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.alinhadorContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("InfosScreen")}>
-          <Text>Help</Text>
-        </TouchableOpacity>
-      </View>
-
       <PhotoPickerModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onSelectAvatar={handleAvatarSelect}
         onPickGallery={pickFromGallery}
         onPickCamera={pickFromCamera}
         title="Escolha sua foto de perfil"
@@ -105,53 +83,13 @@ export default function CustomDrawerContent() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F9F3F6",
-  },
-  headerContainer: {
-    alignItems: "center",
-    paddingBottom: 40,
-  },
-  photoContainer: {
-    alignItems: "center",
-  },
-  photo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: "#6B4226",
-  },
-  changeText: {
-    marginTop: 10,
-    color: "#2C2C2C",
-    fontWeight: "600",
-    fontSize: 14,
-    fontFamily:"Nunito_400Regular",
-  },
-  separator: {
-    width: "80%",
-    height: 1,
-    backgroundColor: "#6B4226",
-    marginTop: 20,
-  },
-  menuItem: {
-    paddingVertical: 15,
-  },
-  menuText: {
-    fontSize: 16,
-    color: "#2C2C2C",
-    fontFamily: "Nunito_400Regular",
-  },
-  footerContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    paddingBottom: 30,
-    alignItems: "center",
-  },
-  alinhadorContainer: {
-    paddingLeft: 70,
-  },
-  
+  container: { flex: 1, backgroundColor: "#F9F3F6" },
+  headerContainer: { alignItems: "center", paddingBottom: 40 },
+  photoContainer: { alignItems: "center" },
+  photo: { width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: "#6B4226" },
+  changeText: { marginTop: 10, color: "#2C2C2C", fontWeight: "600", fontSize: 14 },
+  separator: { width: "80%", height: 1, backgroundColor: "#6B4226", marginTop: 20 },
+  menuItem: { paddingVertical: 15 },
+  menuText: { fontSize: 16, color: "#2C2C2C" },
+  alinhadorContainer: { paddingLeft: 70 },
 });
