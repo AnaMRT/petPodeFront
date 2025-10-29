@@ -32,7 +32,7 @@ export const UserProvider = ({ children }) => {
         name: "perfil.jpg",
       });
 
-      const response = await fetch("http://10.0.6.21:8080/usuario/imagem", {
+      const response = await fetch("https://petpodeback.onrender.com/usuario/imagem", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${authUser.token}`,
