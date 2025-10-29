@@ -145,8 +145,8 @@ export default function App() {
               <Stack.Screen name="Cadastro" component={RegisterScreen} />
               <Stack.Screen name="Cadastro de Pets" component={RegisterScreenPet} />
               <Stack.Screen name="PetsScreen" component={PetsScreen} />
-              <Stack.Screen name="EditarPetScreen" component={EditarPetScreen} />
-              <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen} />
+              <Stack.Screen name="EditarPetScreen" component={EditarPetScreen} options={{ headerShown: true, title: "EDITAR PET", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", },headerTitleStyle: {color:"#2C2C2C",fontSize: 34,  fontFamily: "PlayfairDisplay_700Bold", }}}/>
+              <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen} options={{ headerShown: true, title: "EDITAR PERFIL", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", },headerTitleStyle: {color:"#2C2C2C",fontSize: 34,  fontFamily: "PlayfairDisplay_700Bold", }}}/> 
               <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} />
               <Stack.Screen name="Home" component={DrawerRoutes} />
               <Stack.Screen name="InfosScreen" component={InfosScreen} />

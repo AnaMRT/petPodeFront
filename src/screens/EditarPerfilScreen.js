@@ -41,7 +41,6 @@ export default function EditarPerfilScreen({ navigation }) {
 
     try {
       const token = await AsyncStorage.getItem("token");
-
       if (!token) {
         setLoading(false);
         return Alert.alert("Erro", "Usuário não autenticado.");
@@ -52,15 +51,11 @@ export default function EditarPerfilScreen({ navigation }) {
       if (email !== user?.email) payload.email = email;
       if (novaSenha) {
         payload.senha = novaSenha;
-        payload.senhaAtual = senhaAntiga; 
+        payload.senhaAtual = senhaAntiga;
       }
 
-      console.log("[EditarPerfilScreen] Payload enviado:", payload);
-
       const response = await api.put("/usuario", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setUser(response.data);
@@ -69,10 +64,7 @@ export default function EditarPerfilScreen({ navigation }) {
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      console.error(
-        "[EditarPerfilScreen] Erro ao atualizar perfil:",
-        error.response?.data || error.message || error
-      );
+      console.error("[EditarPerfilScreen] Erro:", error.response?.data || error.message);
       Alert.alert("Erro", "Não foi possível atualizar o perfil.");
     } finally {
       setLoading(false);
@@ -82,7 +74,6 @@ export default function EditarPerfilScreen({ navigation }) {
   return (
     <ScreenWrapper>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>EDITAR PERFIL</Text>
 
         <Text style={styles.label}>Nome</Text>
         <TextInput
@@ -145,16 +136,10 @@ export default function EditarPerfilScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 50,
     padding: 20,
     backgroundColor: "#F9F3F6",
     flexGrow: 1,
-  },
-  title: {
-    fontSize: 40,
-    color: "#2C2C2C",
-    textAlign: "center",
-    marginBottom: 100,
-    fontFamily: "PlayfairDisplay_700Bold",
   },
   label: {
     marginBottom: 6,
@@ -167,7 +152,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 18,
     fontWeight: "700",
-    color: "##2C2C2C",
+    color: "#2C2C2C",
   },
   input: {
     backgroundColor: "#fff",
