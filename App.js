@@ -149,7 +149,7 @@ export default function App() {
               <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen} options={{ headerShown: true, title: "EDITAR PERFIL", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", },headerTitleStyle: {color:"#2C2C2C",fontSize: 34,  fontFamily: "PlayfairDisplay_700Bold", }}}/> 
               <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} />
               <Stack.Screen name="Home" component={DrawerRoutes} />
-              <Stack.Screen name="InfosScreen" component={InfosScreen} />
+              <Stack.Screen name="InfosScreen" component={InfosScreen} options={{ headerShown: true, title: "", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", }}}/> 
               <Stack.Screen name="Plano" component={PlanoScreen}/>
             </Stack.Navigator>
           </NavigationContainer>
