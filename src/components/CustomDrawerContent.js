@@ -13,30 +13,35 @@ export default function CustomDrawerContent() {
   const navigation = useNavigation();
   const { logout } = useContext(AuthContext);
 
+  // === Selecionar foto da galeria ===
   const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
+
     if (!result.canceled) {
-      await setUserPhoto(result.assets[0].uri);
+      await setUserPhoto(result.assets[0].uri); // chama o upload e atualiza contexto
       setModalVisible(false);
     }
   };
 
+  // === Tirar foto com câmera ===
   const pickFromCamera = async () => {
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
+
     if (!result.canceled) {
       await setUserPhoto(result.assets[0].uri);
       setModalVisible(false);
     }
   };
 
+  // === Logout ===
   const handleLogout = async () => {
     await logout();
     navigation.dispatch(
@@ -50,9 +55,17 @@ export default function CustomDrawerContent() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.photoContainer}>
+        {/* Foto do usuário */}
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={styles.photoContainer}
+        >
           <Image
-            source={userPhoto ? { uri: userPhoto } : require("../../assets/user-placeholder.png")}
+            source={
+              userPhoto
+                ? { uri: userPhoto } // pega do backend ou do state
+                : require("../../assets/user-placeholder.png")
+            }
             style={styles.photo}
           />
           <Text style={styles.changeText}>Alterar Foto</Text>
@@ -60,7 +73,10 @@ export default function CustomDrawerContent() {
 
         <View style={styles.separator} />
 
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("EditarPerfilScreen")}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate("EditarPerfilScreen")}
+        >
           <Text style={styles.menuText}>Editar Perfil</Text>
         </TouchableOpacity>
       </View>
@@ -71,6 +87,7 @@ export default function CustomDrawerContent() {
         </TouchableOpacity>
       </View>
 
+      {/* Modal de escolha da foto */}
       <PhotoPickerModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -86,7 +103,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F9F3F6" },
   headerContainer: { alignItems: "center", paddingBottom: 40 },
   photoContainer: { alignItems: "center" },
-  photo: { width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: "#6B4226" },
+  photo: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "#6B4226",
+  },
   changeText: { marginTop: 10, color: "#2C2C2C", fontWeight: "600", fontSize: 14 },
   separator: { width: "80%", height: 1, backgroundColor: "#6B4226", marginTop: 20 },
   menuItem: { paddingVertical: 15 },

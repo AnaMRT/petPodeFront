@@ -1,28 +1,42 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "./AuthContext";
+import api from "../../api";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({ nome: "Usuário", email: "usuario@exemplo.com", senha: "123456" });
-  const [userPhoto, setUserPhotoState] = useState(null);
+  const [user, setUser] = useState(null);
+  const [userPhoto, setUserPhoto] = useState(null);
   const { user: authUser, loading } = useContext(AuthContext);
 
-  const setUserPhoto = async (uri) => {
-    if (!uri) {
-      setUserPhotoState(null);
-      return;
-    }
+  // ✅ Carrega usuário do backend quando tem token
+  useEffect(() => {
+    const loadUser = async () => {
+      if (!authUser?.token) return;
 
-    if (loading) {
-      console.warn("Token ainda está sendo carregado");
-      return;
-    }
+      try {
+        const response = await api.get("/usuario/logado", {
+          headers: { Authorization: `Bearer ${authUser.token}` },
+        });
 
-    if (!authUser?.token) {
-      console.error("Token não disponível. Usuário precisa estar logado.");
-      return;
-    }
+        setUser(response.data);
+        setUserPhoto(response.data.imagemUrl || null);
+
+        // salva caso queira recuperar sem chamar a API
+        await AsyncStorage.setItem("userInfo", JSON.stringify(response.data));
+
+      } catch (error) {
+        console.log("Erro ao carregar usuário:", error.response?.data || error);
+      }
+    };
+
+    loadUser();
+  }, [authUser]);
+
+  // ✅ Upload e atualização da foto
+  const setUserPhotoUpload = async (uri) => {
+    if (!authUser?.token) return;
 
     try {
       const formData = new FormData();
@@ -32,31 +46,31 @@ export const UserProvider = ({ children }) => {
         name: "perfil.jpg",
       });
 
-      const response = await fetch("https://petpodeback.onrender.com/usuario/imagem", {
-        method: "PUT",
+      const response = await api.put("/usuario/imagem", formData, {
         headers: {
           Authorization: `Bearer ${authUser.token}`,
+          "Content-Type": "multipart/form-data",
         },
-        body: formData,
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Erro ao enviar imagem:", text);
-        return;
-      }
+      const novaUrl = response.data.imagemUrl;
+      setUserPhoto(novaUrl);
 
-      const data = await response.json();
-      console.log("Upload realizado:", data);
-      setUserPhotoState(data.imagemUrl);
+      setUser((prev) => ({ ...prev, imagemUrl: novaUrl }));
+      await AsyncStorage.setItem(
+        "userInfo",
+        JSON.stringify({ ...user, imagemUrl: novaUrl })
+      );
+
+      console.log("✅ Foto atualizada!");
 
     } catch (error) {
-      console.error("Erro ao enviar imagem:", error);
+      console.error("Erro ao enviar imagem:", error.response?.data || error);
     }
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, userPhoto, setUserPhoto }}>
+    <UserContext.Provider value={{ user, setUser, userPhoto, setUserPhoto: setUserPhotoUpload }}>
       {children}
     </UserContext.Provider>
   );
