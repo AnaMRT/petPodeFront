@@ -22,7 +22,7 @@ export default function RegisterScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const { login } = useContext(AuthContext);
-  const { fetchUser } = useContext(UserContext); // Função para atualizar dados do usuário
+  const { fetchUser } = useContext(UserContext);
 
   const handleRegister = async () => {
     if (!nome || !email || !senha) {
@@ -33,7 +33,7 @@ export default function RegisterScreen({ navigation }) {
     try {
       setLoading(true);
 
-      // 1️⃣ Cadastra o usuário
+      // ✅ 1) Cadastra no backend
       const response = await api.post("/auth/cadastro", {
         nome,
         email,
@@ -42,10 +42,10 @@ export default function RegisterScreen({ navigation }) {
 
       const token = response.data.token;
 
-      // 2️⃣ Atualiza o AuthContext
+      // ✅ 2) Salva token no AuthContext
       await login(token);
 
-      // 3️⃣ Atualiza o UserContext imediatamente
+      // ✅ 3) Faz a primeira chamada real para obter nome, email e foto
       await fetchUser(token);
 
       Alert.alert(
@@ -54,6 +54,7 @@ export default function RegisterScreen({ navigation }) {
       );
 
       navigation.navigate("Cadastro de Pets");
+
     } catch (error) {
       console.error("❌ Erro no cadastro:", error.response?.data || error);
       Alert.alert("Erro", "Não foi possível cadastrar o usuário.");
