@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   TextInput,
@@ -8,10 +8,11 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button } from "react-native-elements";
 import ScreenWrapper from "../components/ScreenWrapper";
 import api from "../../api";
+import { AuthContext } from "../context/AuthContext";
+import { UserContext } from "../context/UserContext";
 
 export default function RegisterScreen({ navigation }) {
   const [nome, setNome] = useState("");
@@ -19,6 +20,9 @@ export default function RegisterScreen({ navigation }) {
   const [senha, setSenha] = useState("");
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const { login } = useContext(AuthContext);
+  const { fetchUser } = useContext(UserContext); // Função para atualizar dados do usuário
 
   const handleRegister = async () => {
     if (!nome || !email || !senha) {
@@ -28,7 +32,8 @@ export default function RegisterScreen({ navigation }) {
 
     try {
       setLoading(true);
-      // Cadastra o usuário
+
+      // 1️⃣ Cadastra o usuário
       const response = await api.post("/auth/cadastro", {
         nome,
         email,
@@ -36,7 +41,12 @@ export default function RegisterScreen({ navigation }) {
       });
 
       const token = response.data.token;
-      await AsyncStorage.setItem("token", token);
+
+      // 2️⃣ Atualiza o AuthContext
+      await login(token);
+
+      // 3️⃣ Atualiza o UserContext imediatamente
+      await fetchUser(token);
 
       Alert.alert(
         "Sucesso",

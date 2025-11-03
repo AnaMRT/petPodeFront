@@ -6,35 +6,51 @@ import api from "../../api";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);       // Dados do usuário
   const [userPhoto, setUserPhoto] = useState(null);
   const { user: authUser, loading } = useContext(AuthContext);
 
-  // ✅ Carrega usuário do backend quando tem token
+  // Função para carregar usuário do backend
+  const fetchUser = async (token) => {
+    if (!token) return;
+
+    try {
+      console.log("➡️ Buscando usuário logado com token:", token);
+      const response = await api.get("/usuario/logado", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const userData = response.data;
+      console.log("✅ Usuário carregado:", userData);
+
+      setUser(userData);
+      setUserPhoto(userData.imagemUrl || null);
+
+      await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
+    } catch (error) {
+      console.log(
+        "❌ Erro ao carregar usuário:",
+        error.response?.data || error
+      );
+      setUser(null);
+      setUserPhoto(null);
+      await AsyncStorage.removeItem("userInfo");
+    }
+  };
+
+  // 🔹 Carrega usuário sempre que o token muda, mas espera loading do AuthContext
   useEffect(() => {
-    const loadUser = async () => {
-      if (!authUser?.token) return;
+    if (!loading && authUser?.token) {
+      fetchUser(authUser.token);
+    } else if (!loading && !authUser?.token) {
+      // Se não houver token, limpa o usuário
+      setUser(null);
+      setUserPhoto(null);
+      AsyncStorage.removeItem("userInfo");
+    }
+  }, [authUser?.token, loading]);
 
-      try {
-        const response = await api.get("/usuario/logado", {
-          headers: { Authorization: `Bearer ${authUser.token}` },
-        });
-
-        setUser(response.data);
-        setUserPhoto(response.data.imagemUrl || null);
-
-        // salva caso queira recuperar sem chamar a API
-        await AsyncStorage.setItem("userInfo", JSON.stringify(response.data));
-
-      } catch (error) {
-        console.log("Erro ao carregar usuário:", error.response?.data || error);
-      }
-    };
-
-    loadUser();
-  }, [authUser]);
-
-  // ✅ Upload e atualização da foto
+  // 🔹 Upload e atualização da foto
   const setUserPhotoUpload = async (uri) => {
     if (!authUser?.token) return;
 
@@ -53,24 +69,31 @@ export const UserProvider = ({ children }) => {
         },
       });
 
-      const novaUrl = response.data.imagemUrl;
-      setUserPhoto(novaUrl);
+      const updatedUser = response.data;
+      console.log("✅ Foto atualizada no backend:", updatedUser.imagemUrl);
 
-      setUser((prev) => ({ ...prev, imagemUrl: novaUrl }));
-      await AsyncStorage.setItem(
-        "userInfo",
-        JSON.stringify({ ...user, imagemUrl: novaUrl })
-      );
+      setUser(updatedUser);
+      setUserPhoto(updatedUser.imagemUrl);
 
-      console.log("✅ Foto atualizada!");
-
+      await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUser));
     } catch (error) {
-      console.error("Erro ao enviar imagem:", error.response?.data || error);
+      console.error(
+        "❌ Erro ao enviar imagem:",
+        error.response?.data || error
+      );
     }
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, userPhoto, setUserPhoto: setUserPhotoUpload }}>
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        userPhoto,
+        setUserPhoto: setUserPhotoUpload,
+        fetchUser, // exporta para atualizar manualmente após cadastro
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
