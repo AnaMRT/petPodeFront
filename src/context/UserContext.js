@@ -10,18 +10,17 @@ export const UserProvider = ({ children }) => {
   const [userPhoto, setUserPhoto] = useState(null);
   const { user: authUser, loading } = useContext(AuthContext);
 
-  // Função para carregar usuário do backend
   const fetchUser = async (token) => {
     if (!token) return;
 
     try {
-      console.log("➡️ Buscando usuário logado com token:", token);
+      console.log(" Buscando usuário logado com token:", token);
       const response = await api.get("/usuario/logado", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const userData = response.data;
-      console.log("✅ Usuário carregado:", userData);
+      console.log(" Usuário carregado:", userData);
 
       setUser(userData);
       setUserPhoto(userData.imagemUrl || null);
@@ -29,7 +28,7 @@ export const UserProvider = ({ children }) => {
       await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
     } catch (error) {
       console.log(
-        "❌ Erro ao carregar usuário:",
+        " Erro ao carregar usuário:",
         error.response?.data || error
       );
       setUser(null);
@@ -38,19 +37,16 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // 🔹 Carrega usuário sempre que o token muda, mas espera loading do AuthContext
   useEffect(() => {
     if (!loading && authUser?.token) {
       fetchUser(authUser.token);
     } else if (!loading && !authUser?.token) {
-      // Se não houver token, limpa o usuário
       setUser(null);
       setUserPhoto(null);
       AsyncStorage.removeItem("userInfo");
     }
   }, [authUser?.token, loading]);
 
-  // 🔹 Upload e atualização da foto
   const setUserPhotoUpload = async (uri) => {
     if (!authUser?.token) return;
 
@@ -70,7 +66,7 @@ export const UserProvider = ({ children }) => {
       });
 
       const updatedUser = response.data;
-      console.log("✅ Foto atualizada no backend:", updatedUser.imagemUrl);
+      console.log(" Foto atualizada no backend:", updatedUser.imagemUrl);
 
       setUser(updatedUser);
       setUserPhoto(updatedUser.imagemUrl);
@@ -78,7 +74,7 @@ export const UserProvider = ({ children }) => {
       await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUser));
     } catch (error) {
       console.error(
-        "❌ Erro ao enviar imagem:",
+        " Erro ao enviar imagem:",
         error.response?.data || error
       );
     }
@@ -91,7 +87,7 @@ export const UserProvider = ({ children }) => {
         setUser,
         userPhoto,
         setUserPhoto: setUserPhotoUpload,
-        fetchUser, // exporta para atualizar manualmente após cadastro
+        fetchUser, 
       }}
     >
       {children}

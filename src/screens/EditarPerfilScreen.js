@@ -32,7 +32,6 @@ export default function EditarPerfilScreen({ navigation }) {
       setLoading(false);
       return Alert.alert("Erro", "Usuário não autenticado.");
     }
-
     const payload = {
       nome,
       email,

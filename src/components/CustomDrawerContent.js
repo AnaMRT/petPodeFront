@@ -15,15 +15,12 @@ export default function CustomDrawerContent() {
   const navigation = useNavigation();
   const { logout } = useContext(AuthContext);
 
-  // Seleciona avatar pronto
   const handleSelectAvatar = async (avatar) => {
-    // Converte o asset do React Native para URI
     const avatarUri = Image.resolveAssetSource(avatar).uri;
     await setUserPhoto(avatarUri);
     setModalVisible(false);
   };
 
-  // Escolher da galeria
   const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -125,7 +122,7 @@ export default function CustomDrawerContent() {
       <PhotoPickerModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onSelectAvatar={handleSelectAvatar} // ✅ avatar pronto
+        onSelectAvatar={handleSelectAvatar}
         onPickGallery={pickFromGallery}
         onPickCamera={pickFromCamera}
         title="Escolha sua foto de perfil"

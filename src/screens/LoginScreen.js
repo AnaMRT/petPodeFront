@@ -31,7 +31,7 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [senhaVisivel, setSenhaVisivel] = useState(false);
-  const { login } = useContext(AuthContext); // 👈 pega o login() do contexto
+  const { login } = useContext(AuthContext); 
 
   const handleLogin = async () => {
     try {
@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation }) {
       await AsyncStorage.setItem("token", token);
       Alert.alert("Login OK");
       navigation.navigate("Home");
-      await login(token); // 👈 salva e atualiza o estado global
+      await login(token); 
 
       navigation.reset({
         index: 0,
