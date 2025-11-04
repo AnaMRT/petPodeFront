@@ -17,7 +17,6 @@ export default function HomeScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [plantaSelecionada, setPlantaSelecionada] = useState(null);
   const [favoritosIds, setFavoritosIds] = useState([]);
-
   const { userPhoto } = useContext(UserContext);
 
   useEffect(() => {
