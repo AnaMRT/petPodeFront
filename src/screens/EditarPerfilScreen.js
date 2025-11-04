@@ -24,52 +24,46 @@ export default function EditarPerfilScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!nome && !email && !novaSenha) {
-      return Alert.alert("Aviso", "Nenhum campo foi alterado.");
-    }
+  setLoading(true);
 
-    if (novaSenha || confirmarSenha) {
-      if (!senhaAntiga) {
-        return Alert.alert("Erro", "Digite sua senha atual para alterá-la.");
-      }
-      if (novaSenha !== confirmarSenha) {
-        return Alert.alert("Erro", "As novas senhas não coincidem.");
-      }
-    }
-
-    setLoading(true);
-
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return Alert.alert("Erro", "Usuário não autenticado.");
-      }
-
-      const payload = {};
-      if (nome !== user?.nome) payload.nome = nome;
-      if (email !== user?.email) payload.email = email;
-      if (novaSenha) {
-        payload.senha = novaSenha;
-        payload.senhaAtual = senhaAntiga;
-      }
-
-      const response = await api.put("/usuario", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setUser(response.data);
-
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!", [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
-    } catch (error) {
-      console.error("[EditarPerfilScreen] Erro:", error.response?.data || error.message);
-      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
-    } finally {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
       setLoading(false);
+      return Alert.alert("Erro", "Usuário não autenticado.");
     }
-  };
+
+    const payload = {
+      nome,
+      email,
+      senha: novaSenha || null,
+      senhaAtual: senhaAntiga || null,
+      confirmarSenha: confirmarSenha || null,
+    };
+
+    const response = await api.put("/usuario", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setUser(response.data);
+
+    Alert.alert("Sucesso", "Perfil atualizado com sucesso!", [
+      { text: "OK", onPress: () => navigation.goBack() },
+    ]);
+
+  } catch (error) {
+    console.log("ERRO AO ATUALIZAR PERFIL:", error.response?.data);
+
+    const mensagem =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Erro ao atualizar perfil";
+
+    Alert.alert("Erro", mensagem);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <ScreenWrapper>
