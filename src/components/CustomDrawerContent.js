@@ -33,6 +33,7 @@ export default function CustomDrawerContent() {
     }
   };
 
+  // Tirar foto
   const pickFromCamera = async () => {
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
