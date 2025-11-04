@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   View, Text, TextInput, TouchableOpacity,
   FlatList, Image, ActivityIndicator, Keyboard, Modal, StyleSheet
@@ -9,6 +9,7 @@ import ScreenWrapper from "../components/ScreenWrapper";
 import { Ionicons } from "@expo/vector-icons";
 import { UserContext } from "../context/UserContext";
 import PlantCard from "../components/PlantCard";
+import { useFocusEffect } from "@react-navigation/native"; // ✅ IMPORTADO
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -23,6 +24,13 @@ export default function HomeScreen({ navigation }) {
     carregarPlantas();
     carregarFavoritos();
   }, []);
+
+  // ✅ Recarregar favoritos quando voltar pra Home
+  useFocusEffect(
+    useCallback(() => {
+      carregarFavoritos();
+    }, [])
+  );
 
   const carregarPlantas = async () => {
     try {
@@ -96,10 +104,9 @@ export default function HomeScreen({ navigation }) {
     />
   );
 
-  // 🔹 Aqui criamos uma cópia da lista e adicionamos um item vazio se houver número ímpar
   const plantasComEspaco = [...plantas];
   if (plantas.length % 2 !== 0) {
-    plantasComEspaco.push({ id: "vazio" }); // adiciona item “fantasma” para manter o alinhamento
+    plantasComEspaco.push({ id: "vazio" });
   }
 
   return (
@@ -138,11 +145,7 @@ export default function HomeScreen({ navigation }) {
             data={plantasComEspaco}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) =>
-              item.id === "vazio" ? (
-                <View style={[styles.cardVazio]} />
-              ) : (
-                renderItem({ item })
-              )
+              item.id === "vazio" ? <View style={[styles.cardVazio]} /> : renderItem({ item })
             }
             numColumns={2}
             columnWrapperStyle={styles.linha}
@@ -150,7 +153,7 @@ export default function HomeScreen({ navigation }) {
           />
         )}
 
-        {/* Modal de detalhes */}
+        {/* Modal */}
         <Modal visible={modalVisible} animationType="fade" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
