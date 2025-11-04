@@ -4,10 +4,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // indica se o token está sendo carregado
+  const [user, setUser] = useState(null); 
+  const [loading, setLoading] = useState(true);
 
-  // Carrega token ao iniciar
   useEffect(() => {
     const loadToken = async () => {
       try {
@@ -34,6 +33,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await AsyncStorage.removeItem("userToken");
+      await AsyncStorage.removeItem("userInfo");
       setUser(null);
     } catch (e) {
       console.error("Erro ao remover token", e);
