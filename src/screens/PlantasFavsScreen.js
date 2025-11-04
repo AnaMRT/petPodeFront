@@ -40,31 +40,42 @@ export default function PlantasFavsScreen({ navigation }) {
   }, [navigation]);
 
   const handleToggleFavorite = async (plantaId, isFavorito) => {
-    try {
-      const token = await AsyncStorage.getItem("token");
+  try {
+    const token = await AsyncStorage.getItem("token");
 
-      if (isFavorito) {
-        await api.put(`/favoritos/${plantaId}`, null, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setFavoritosIds((prev) => [...prev, plantaId]);
-        const planta = favoritas.find((p) => p.id === plantaId);
-        if (planta && !favoritas.includes(planta)) {
-          setFavoritas((prev) => [...prev, planta]);
-        }
-      } else {
-        await api.delete(`/favoritos/${plantaId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
-        setFavoritas((prev) => prev.filter((p) => p.id !== plantaId));
+    if (isFavorito) {
+      // Favoritar
+      await api.put(`/favoritos/${plantaId}`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFavoritosIds((prev) => [...prev, plantaId]);
+
+      const planta = favoritas.find((p) => p.id === plantaId);
+      if (planta) {
+        setFavoritas((prev) => [...prev, planta]);
       }
-    } catch (error) {
-      console.error("Erro ao atualizar favorito:", error);
-      Alert.alert("Erro", "Não foi possível atualizar seus favoritos.");
-    }
-  };
 
+    } else {
+      // Desfavoritar
+      await api.delete(`/favoritos/${plantaId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
+
+      // Remove da lista da tela de favoritos
+      setFavoritas((prev) => prev.filter((p) => p.id !== plantaId));
+
+      // Se estiver no modal, fecha com delay pra animação ficar ok
+      setTimeout(() => setModalVisible(false), 100);
+    }
+
+  } catch (error) {
+    console.error("Erro ao atualizar favorito:", error);
+    Alert.alert("Erro", "Não foi possível atualizar seus favoritos.");
+  }
+};
   const renderItem = ({ item }) => (
       <PlantCard
         planta={item}
