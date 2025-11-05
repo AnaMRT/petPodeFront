@@ -27,11 +27,10 @@ export default function PetsScreen({ navigation }) {
   const [selectedPetImage, setSelectedPetImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  // Carrega pets do backend
   const fetchPets = async () => {
     try {
       setLoading(true);
-      const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("userToken"); // ✅ CORRIGIDO
       const response = await api.get("/pet", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -49,7 +48,6 @@ export default function PetsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  // === ✅ NOVA LÓGICA DE UPLOAD DE IMAGEM (ENVIA DIRETO PARA O BACKEND) ===
   const handleChangePhoto = async (pet) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -62,7 +60,7 @@ export default function PetsScreen({ navigation }) {
 
     try {
       setUploading(true);
-      const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("userToken"); // ✅ CORRIGIDO
 
       const formData = new FormData();
       formData.append("file", {
@@ -95,7 +93,7 @@ export default function PetsScreen({ navigation }) {
 
   const handleDelete = async (petId) => {
     try {
-      const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("userToken"); // ✅ CORRIGIDO
       await api.delete(`/pet/${petId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -175,7 +173,6 @@ export default function PetsScreen({ navigation }) {
                       />
                     </TouchableOpacity>
 
-                    {/* DELETE */}
                     <TouchableOpacity
                       style={styles.deleteIcon}
                       onPress={() =>
@@ -196,7 +193,6 @@ export default function PetsScreen({ navigation }) {
                       <Text style={styles.deleteText}>✕</Text>
                     </TouchableOpacity>
 
-                    {/* EDITAR */}
                     <TouchableOpacity
                       style={styles.editIcon}
                       onPress={() => abrirEditarPet(item)}
@@ -210,7 +206,6 @@ export default function PetsScreen({ navigation }) {
               }
             />
 
-            {/* Modal de visualização da imagem */}
             <Modal
               visible={!!selectedPetImage}
               transparent
