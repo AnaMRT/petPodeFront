@@ -32,7 +32,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Remove token e dados do usuário
       await AsyncStorage.removeItem("userToken");
       await AsyncStorage.removeItem("userInfo");
       setUser(null);
