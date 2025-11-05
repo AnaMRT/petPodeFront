@@ -33,17 +33,26 @@ export default function CustomDrawerContent() {
     }
   };
 
-  const pickFromCamera = async () => {
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-    if (!result.canceled) {
-      await setUserPhoto(result.assets[0].uri);
-      setModalVisible(false);
-    }
-  };
+ const pickFromCamera = async () => {
+  const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+  if (status !== "granted") {
+    alert("Permissão da câmera negada. Habilite nas configurações.");
+    return;
+  }
+
+  const result = await ImagePicker.launchCameraAsync({
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 1,
+  });
+
+  if (!result.canceled) {
+    await setUserPhoto(result.assets[0].uri);
+    setModalVisible(false);
+  }
+};
+
 
   // Logout
   const handleLogout = async () => {
