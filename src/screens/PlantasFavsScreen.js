@@ -125,7 +125,7 @@ const token = await AsyncStorage.getItem("userToken");
                    }
                    numColumns={2}
                    columnWrapperStyle={styles.linha}
-                   contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 5 }}
+                   contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 20 }}
                  />
       )}
        {/* Modal de detalhes */}

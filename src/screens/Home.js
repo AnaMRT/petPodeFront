@@ -149,7 +149,7 @@ export default function HomeScreen({ navigation }) {
             }
             numColumns={2}
             columnWrapperStyle={styles.linha}
-            contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 5 }}
+            contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 5, }}
           />
         )}
 
