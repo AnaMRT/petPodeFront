@@ -22,10 +22,10 @@ export default function EditarPerfilScreen({ navigation }) {
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleSave = async () => {
     setLoading(true);
-
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -50,12 +50,11 @@ export default function EditarPerfilScreen({ navigation }) {
       Alert.alert("Sucesso", "Perfil atualizado com sucesso!", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
-
     } catch (error) {
       console.log("ERRO AO ATUALIZAR PERFIL:", error.response?.data);
 
       const mensagem =
-        error.response?.data?.mensagem ||     
+        error.response?.data?.mensagem ||
         error.response?.data?.message ||
         error.response?.data?.error ||
         "Erro ao atualizar perfil";
@@ -66,10 +65,52 @@ export default function EditarPerfilScreen({ navigation }) {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      "Excluir Conta",
+      "Tem certeza que deseja excluir sua conta? Todos os seus dados serão apagados permanentemente.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setDeleting(true);
+              const token = await AsyncStorage.getItem("token");
+              if (!token) {
+                setDeleting(false);
+                return Alert.alert("Erro", "Usuário não autenticado.");
+              }
+
+              await api.delete("/usuario", {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+
+              // Limpar tudo
+              await AsyncStorage.clear();
+              setUser(null);
+
+              Alert.alert("Conta excluída", "Sua conta foi removida com sucesso!");
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Login" }],
+              });
+            } catch (error) {
+              console.log("ERRO AO EXCLUIR CONTA:", error.response?.data);
+              Alert.alert("Erro", "Não foi possível excluir a conta.");
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <ScreenWrapper>
       <ScrollView contentContainerStyle={styles.container}>
-
         <Text style={styles.label}>Nome</Text>
         <TextInput
           style={styles.input}
@@ -124,6 +165,14 @@ export default function EditarPerfilScreen({ navigation }) {
           buttonStyle={styles.saveButton}
           titleStyle={styles.saveButtonText}
         />
+
+        <Button
+          title={deleting ? "Excluindo..." : "Excluir Conta"}
+          onPress={handleDeleteAccount}
+          disabled={deleting}
+          buttonStyle={styles.deleteButton}
+          titleStyle={styles.deleteButtonText}
+        />
       </ScrollView>
     </ScreenWrapper>
   );
@@ -166,6 +215,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   saveButtonText: {
+    color: "#fff",
+    fontWeight: "700",
+  },
+  deleteButton: {
+    backgroundColor: "#8A6E63",
+    borderRadius: 20,
+    paddingVertical: 14,
+    marginTop: 20,
+  },
+  deleteButtonText: {
     color: "#fff",
     fontWeight: "700",
   },
