@@ -13,8 +13,8 @@ export default function PlantCard({ planta, onPress, isFavorite = false, onToggl
 
   const toggleFavorite = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      const novoEstado = !favorito;
+ const token = await AsyncStorage.getItem("userToken"); 
+       const novoEstado = !favorito;
 
       if (novoEstado) {
         await api.put(`/favoritos/${planta.id}`, null, {

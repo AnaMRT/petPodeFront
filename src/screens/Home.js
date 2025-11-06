@@ -46,8 +46,8 @@ export default function HomeScreen({ navigation }) {
 
   const carregarFavoritos = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await api.get("/favoritos", {
+ const token = await AsyncStorage.getItem("userToken"); 
+       const response = await api.get("/favoritos", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFavoritosIds(response.data.map((p) => p.id));
@@ -64,8 +64,8 @@ export default function HomeScreen({ navigation }) {
     }
     try {
       setCarregando(true);
-      const token = await AsyncStorage.getItem("token");
-      const response = await api.get("/plantas/search", {
+ const token = await AsyncStorage.getItem("userToken"); 
+       const response = await api.get("/plantas/search", {
         params: { termo: busca },
         headers: { Authorization: `Bearer ${token}` },
       });
