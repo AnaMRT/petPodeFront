@@ -123,7 +123,7 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.searchBox}>
             <TextInput
               style={styles.searchInput}
-              placeholder="BUSCAR PLANTAS"
+              placeholder="BUSCAR PLANTAS OU PETS"
               placeholderTextColor="#999"
               value={busca}
               onChangeText={setBusca}
