@@ -61,10 +61,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 5,
     position: "relative",
+    borderRadius: 6,
   },
   imagem: {
     width: "100%",
     height: 150,
+    borderTopLeftRadius:6,
+    borderTopRightRadius:6,
   },
   favoriteIcon: {
     position: "absolute",

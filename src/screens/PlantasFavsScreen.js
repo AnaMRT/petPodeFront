@@ -126,7 +126,7 @@ export default function PlantasFavsScreen({ navigation }) {
                    }
                    numColumns={2}
                    columnWrapperStyle={styles.linha}
-                   contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 5 }}
+                   contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 20 }}
                  />
       )}
        {/* Modal de detalhes */}

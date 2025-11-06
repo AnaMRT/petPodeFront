@@ -67,10 +67,7 @@ function TabRoutes() {
             borderWidth: 1,
             borderColor: "#A3B18A",
             backgroundColor: "#F9F3F6",
-            shadowColor: "#000",
-            shadowOpacity: 0.05,
-            shadowRadius: 4,
-            elevation: 2,
+            marginTop: -40,
           },
         tabBarActiveTintColor: "#6B4226",
         tabBarInactiveTintColor: "#A3B18A",
@@ -99,7 +96,7 @@ function TabRoutes() {
         component={PetsScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="paw" size={24} color={color} />
+            <Ionicons name="paw-outline" size={24} color={color} />
           ),
         }}
       />
