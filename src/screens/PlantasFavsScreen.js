@@ -18,8 +18,7 @@ export default function PlantasFavsScreen({ navigation }) {
   const carregarFavoritas = async () => {
     try {
       setCarregando(true);
-      const token = await AsyncStorage.getItem("token");
-
+const token = await AsyncStorage.getItem("userToken");
       const response = await api.get("/favoritos", {
         headers: { Authorization: `Bearer ${token}` },
       });
