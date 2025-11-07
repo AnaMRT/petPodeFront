@@ -3,17 +3,20 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
+  TouchableOpacity,
   Alert,
 } from "react-native";
 import api from "../../api";
+import { Button } from "react-native-elements";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ResetSenhaScreen({ route, navigation }) {
-const email = route?.params?.email || "";
+  const email = route?.params?.email || "";
 
   const [codigo, setCodigo] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
 
   const handleResetSenha = async () => {
     if (!codigo || !novaSenha) {
@@ -37,36 +40,48 @@ const email = route?.params?.email || "";
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Redefinir Senha</Text>
-      <Text style={styles.label}>Código recebido no e-mail</Text>
+      <Text style={styles.title}>REDEFINIR SENHA</Text>
       <TextInput
         style={styles.input}
-        placeholder="Código"
+        placeholder="CÓDIGO"
         value={codigo}
         onChangeText={setCodigo}
       />
-      <Text style={styles.label}>Nova senha</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nova senha"
-        secureTextEntry
-        value={novaSenha}
-        onChangeText={setNovaSenha}
+      <View style={styles.inputSenhaContainer}>
+        <TextInput
+          style={{ flex: 1 }}
+          placeholder="NOVA SENHA"
+          secureTextEntry={!senhaVisivel}
+          value={novaSenha}
+          onChangeText={setNovaSenha}
+        />
+        <TouchableOpacity onPress={() => setSenhaVisivel(!senhaVisivel)}>
+          <Ionicons
+            name={senhaVisivel ? "eye" : "eye-off"}
+            size={24}
+            color="#6B4226"
+          />
+        </TouchableOpacity>
+      </View>
+      <Button
+        title="REDEFINIR SENHA"
+        onPress={handleResetSenha}
+        buttonStyle={{
+          backgroundColor: "#6B4226",
+          borderRadius: 20,
+          padding: 14,
+          marginTop: 10,
+          marginBottom: 10,
+        }}
+        titleStyle={{ fontSize: 18, fontFamily: "Nunito_400Regular" }}
       />
-      <Button title="Redefinir Senha" onPress={handleResetSenha} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
-  label: { marginBottom: 5 },
-  input: {
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 5,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor: "#F9F3F6" },
+  title: { fontSize: 64, marginBottom: 100, marginTop: -100, textAlign: "center", fontFamily: "PlayfairDisplay_400Regular", color: "#2C2C2C" },
+  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 20, fontFamily: "Nunito_400Regular", color: "#6D6D6D", backgroundColor: "#fff" },
+   inputSenhaContainer: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, marginBottom: 10, backgroundColor: "#fff" },
 });

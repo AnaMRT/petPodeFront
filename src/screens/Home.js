@@ -136,7 +136,7 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
 
-        <Text style={styles.alerta}>Cuidado: plantas tóxicas para seus pets!</Text>
+        <Text style={styles.alerta}>Cuidado: plantas tóxicas para pets!</Text>
 
         {carregando ? (
           <ActivityIndicator size="large" color="#A3B18A" style={{ marginTop: 20 }} />
