@@ -48,37 +48,38 @@ export const UserProvider = ({ children }) => {
   }, [authUser?.token, loading]);
 
   const setUserPhotoUpload = async (uri) => {
-    if (!authUser?.token) return;
+  if (!authUser?.token) return false;
 
-    try {
-      const formData = new FormData();
-      formData.append("file", {
-        uri,
-        type: "image/jpeg",
-        name: "perfil.jpg",
-      });
+  try {
+    const formData = new FormData();
+    formData.append("file", {
+      uri,
+      type: "image/jpeg",
+      name: "perfil.jpg",
+    });
 
-      const response = await api.put("/usuario/imagem", formData, {
-        headers: {
-          Authorization: `Bearer ${authUser.token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    // Envia a imagem
+    await api.put("/usuario/imagem", formData, {
+      headers: {
+        Authorization: `Bearer ${authUser.token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-      const updatedUser = response.data;
-      console.log(" Foto atualizada no backend:", updatedUser.imagemUrl);
+    console.log("✅ Foto enviada com sucesso. Recarregando usuário...");
 
-      setUser(updatedUser);
-      setUserPhoto(updatedUser.imagemUrl);
+    // Aqui está a diferença importante:
+    // força carregar o usuário atualizado do backend
+    await fetchUser(authUser.token);
 
-      await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUser));
-    } catch (error) {
-      console.error(
-        " Erro ao enviar imagem:",
-        error.response?.data || error
-      );
-    }
-  };
+    return true;
+
+  } catch (error) {
+    console.error("❌ Erro ao enviar imagem:", error.response?.data || error);
+    return false;
+  }
+};
+
 
   return (
     <UserContext.Provider

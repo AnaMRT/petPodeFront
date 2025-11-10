@@ -38,8 +38,9 @@ export default function LoginScreen({ navigation }) {
       const response = await api.post("/auth/login", { email, senha });
       const token = response.data.token;
 
-      await AsyncStorage.setItem("token", token);
-      Alert.alert("Login OK");
+  await AsyncStorage.setItem("userToken", token);
+await login(token);
+         Alert.alert("Login OK");
       navigation.navigate("Home");
       await login(token);
 
