@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
-  Modal,
   Dimensions,
   ActivityIndicator,
 } from "react-native";
@@ -20,9 +19,8 @@ import { PetsContext } from "../context/PetsContext";
 import PhotoPickerModalPet from "../components/PhotoPickerModalPet";
 import {
   MaterialCommunityIcons,
-  FontAwesome5,
-  Ionicons,
   Feather,
+  Ionicons,
 } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
@@ -32,12 +30,13 @@ export default function PetsScreen({ navigation }) {
   const { pets, setPets } = useContext(PetsContext);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-
-  // Modal de troca de foto
   const [modalVisible, setModalVisible] = useState(false);
   const [petSelecionado, setPetSelecionado] = useState(null);
 
-  // Fetch pets
+  // Novo: controle do scroll
+  const [showButton, setShowButton] = useState(false);
+  const flatListRef = useRef(null);
+
   const fetchPets = async () => {
     try {
       setLoading(true);
@@ -59,7 +58,6 @@ export default function PetsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  // Abrir modal para escolher foto do pet
   const abrirModalFotoPet = (pet) => {
     setPetSelecionado(pet);
     setModalVisible(true);
@@ -97,7 +95,6 @@ export default function PetsScreen({ navigation }) {
     }
   };
 
-  // Atualizar foto do pet no backend
   const handleChangePhoto = async (pet, uri) => {
     try {
       setUploading(true);
@@ -133,7 +130,6 @@ export default function PetsScreen({ navigation }) {
     }
   };
 
-  // Deletar pet
   const handleDelete = async (petId) => {
     try {
       const token = await AsyncStorage.getItem("userToken");
@@ -146,9 +142,18 @@ export default function PetsScreen({ navigation }) {
     }
   };
 
-  // Navegação
   const abrirCadastroPet = () => navigation.navigate("Cadastro de Pets");
-  const abrirEditarPet = (pet) => navigation.navigate("EditarPetScreen", { pet });
+  const abrirEditarPet = (pet) =>navigation.navigate("EditarPetScreen", { pet });
+
+  // Funções do botão de scroll
+  const handleScroll = (event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    setShowButton(offsetY > 200);
+  };
+
+  const scrollToTop = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
 
   if (loading) {
     return (
@@ -180,10 +185,14 @@ export default function PetsScreen({ navigation }) {
         ) : (
           <>
             <FlatList
+              ref={flatListRef}
               data={[...pets, { id: "new", isNew: true }]}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
               numColumns={2}
-              columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 20, }}
+              columnWrapperStyle={{
+                justifyContent: "space-between",
+                marginBottom: 20,
+              }}
               renderItem={({ item }) =>
                 item.isNew ? (
                   <TouchableOpacity
@@ -222,7 +231,11 @@ export default function PetsScreen({ navigation }) {
                         )
                       }
                     >
-                      <MaterialCommunityIcons name="trash-can" size={20}  color="#FFF"/>
+                      <MaterialCommunityIcons
+                        name="trash-can"
+                        size={20}
+                        color="#FFF"
+                      />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -236,6 +249,9 @@ export default function PetsScreen({ navigation }) {
                   </View>
                 )
               }
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              contentContainerStyle={{ paddingBottom: 30 }}
             />
 
             {/* Modal de troca de foto */}
@@ -250,8 +266,24 @@ export default function PetsScreen({ navigation }) {
               <ActivityIndicator
                 size="large"
                 color="#6B4226"
-                style={{ position: "absolute", top: "50%", left: "50%", marginLeft: -12, marginTop: -12 }}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginLeft: -12,
+                  marginTop: -12,
+                }}
               />
+            )}
+
+            {/* Botão flutuante para subir */}
+            {showButton && (
+              <TouchableOpacity
+                style={styles.scrollTopButton}
+                onPress={scrollToTop}
+              >
+                <Ionicons name="arrow-up" size={26} color="#fff" />
+              </TouchableOpacity>
             )}
           </>
         )}
@@ -261,21 +293,124 @@ export default function PetsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, paddingTop: 20, backgroundColor: "#F9F3F6" },
-  titulo: { fontSize: 40, color: "#2C2C2C", textAlign: "center", marginBottom: 20, fontFamily: "PlayfairDisplay_700Bold" },
-  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 20 },
-  message: { fontSize: 18, fontWeight: "bold", textAlign: "center", color: "#6B4226", fontFamily: "Nunito_400Regular", marginBottom: 30 },
-  addButton: { backgroundColor: "#6B4226", borderRadius: 20, paddingVertical: 14, paddingHorizontal: 30, alignSelf: "center" },
-  buttonText: { color: "#fff", fontWeight: "bold", fontFamily: "Nunito_400Regular" },
-  petCard: { width: CARD_SIZE, height: CARD_SIZE + 40, backgroundColor: "#fff", alignItems: "center", justifyContent: "flex-start", position: "relative", borderWidth: 1, borderColor: "#A3B18A", borderRadius:6, },
-  petImage: { width: CARD_SIZE, height: CARD_SIZE, backgroundColor: "#C4C4C4", borderTopLeftRadius:6, borderTopRightRadius:6, },
-  petName: { marginTop: 8, fontSize: 14, fontWeight: "bold", color: "#6B4226", textAlign: "center" },
-  addCard: { justifyContent: "center", alignItems: "center", borderWidth: 2, borderStyle: "dashed", borderColor: "#A3B18A", backgroundColor: "#fff9f6" },
-  addText: { fontSize: 16, color: "#6B4226", fontWeight: "bold" },
-  deleteIcon: { position: "absolute", top: 6, right: 6, backgroundColor: "rgba(0,0,0,0.3)", width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", zIndex: 10 },
-  deleteText: { color: "white", fontWeight: "bold" },
-  editIcon: { position: "absolute", top: 6, left: 6, backgroundColor: "rgba(0,0,0,0.3)", width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", zIndex: 10 },
-  editText: { color: "white", fontWeight: "bold", fontSize: 16 },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    backgroundColor: "#F9F3F6",
+  },
+  titulo: {
+    fontSize: 40,
+    color: "#2C2C2C",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "PlayfairDisplay_700Bold",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  message: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#6B4226",
+    fontFamily: "Nunito_400Regular",
+    marginBottom: 30,
+  },
+  addButton: {
+    backgroundColor: "#6B4226",
+    borderRadius: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    alignSelf: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontFamily: "Nunito_400Regular",
+  },
+  petCard: {
+    width: CARD_SIZE,
+    height: CARD_SIZE + 40,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    position: "relative",
+    borderWidth: 1,
+    borderColor: "#A3B18A",
+    borderRadius: 6,
+  },
+  petImage: {
+    width: CARD_SIZE,
+    height: CARD_SIZE,
+    backgroundColor: "#C4C4C4",
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+  },
+  petName: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#6B4226",
+    textAlign: "center",
+  },
+  addCard: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: "#A3B18A",
+    backgroundColor: "#fff9f6",
+  },
+  addText: {
+    fontSize: 16,
+    color: "#6B4226",
+    fontWeight: "bold",
+  },
+  deleteIcon: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+  editIcon: {
+    position: "absolute",
+    top: 6,
+    left: 6,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  loadingText: { color: "#6B4226", fontFamily: "Nunito_400Regular", marginTop: 10 },
+  loadingText: {
+    color: "#6B4226",
+    fontFamily: "Nunito_400Regular",
+    marginTop: 10,
+  },
+  scrollTopButton: {
+    position: "absolute",
+    bottom: 45,
+    right: 25,
+    backgroundColor: "#A3B18A",
+    padding: 14,
+    borderRadius: 30,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
 });

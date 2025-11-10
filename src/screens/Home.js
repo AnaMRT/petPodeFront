@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity,
-  FlatList, Image, ActivityIndicator, Keyboard, Modal, StyleSheet
+  View, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndicator,
+  Keyboard, Modal, StyleSheet, Animated
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
@@ -9,7 +9,7 @@ import ScreenWrapper from "../components/ScreenWrapper";
 import { Ionicons } from "@expo/vector-icons";
 import { UserContext } from "../context/UserContext";
 import PlantCard from "../components/PlantCard";
-import { useFocusEffect } from "@react-navigation/native"; // ✅ IMPORTADO
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -20,12 +20,15 @@ export default function HomeScreen({ navigation }) {
   const [favoritosIds, setFavoritosIds] = useState([]);
   const { userPhoto } = useContext(UserContext);
 
+  const flatListRef = useRef(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [showButton, setShowButton] = useState(false);
+
   useEffect(() => {
     carregarPlantas();
     carregarFavoritos();
   }, []);
 
-  // ✅ Recarregar favoritos quando voltar pra Home
   useFocusEffect(
     useCallback(() => {
       carregarFavoritos();
@@ -46,8 +49,8 @@ export default function HomeScreen({ navigation }) {
 
   const carregarFavoritos = async () => {
     try {
- const token = await AsyncStorage.getItem("userToken"); 
-       const response = await api.get("/favoritos", {
+      const token = await AsyncStorage.getItem("userToken");
+      const response = await api.get("/favoritos", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFavoritosIds(response.data.map((p) => p.id));
@@ -64,8 +67,8 @@ export default function HomeScreen({ navigation }) {
     }
     try {
       setCarregando(true);
- const token = await AsyncStorage.getItem("userToken"); 
-       const response = await api.get("/plantas/search", {
+      const token = await AsyncStorage.getItem("userToken");
+      const response = await api.get("/plantas/search", {
         params: { termo: busca },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -105,14 +108,20 @@ export default function HomeScreen({ navigation }) {
   );
 
   const plantasComEspaco = [...plantas];
-  if (plantas.length % 2 !== 0) {
-    plantasComEspaco.push({ id: "vazio" });
-  }
+  if (plantas.length % 2 !== 0) plantasComEspaco.push({ id: "vazio" });
+
+  const handleScroll = (event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    setShowButton(offsetY > 200); // Mostra o botão depois de rolar 200px
+  };
+
+  const scrollToTop = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* Barra de busca e foto do usuário */}
         <View style={styles.searchRow}>
           <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.iconUserContainer}>
             <Image
@@ -142,6 +151,7 @@ export default function HomeScreen({ navigation }) {
           <ActivityIndicator size="large" color="#A3B18A" style={{ marginTop: 20 }} />
         ) : (
           <FlatList
+            ref={flatListRef}
             data={plantasComEspaco}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) =>
@@ -149,8 +159,16 @@ export default function HomeScreen({ navigation }) {
             }
             numColumns={2}
             columnWrapperStyle={styles.linha}
-            contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 5, }}
+            contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 5 }}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
           />
+        )}
+
+        {showButton && (
+          <TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
+            <Ionicons name="arrow-up" size={26} color="#fff" />
+          </TouchableOpacity>
         )}
 
         {/* Modal */}
@@ -199,125 +217,40 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15, backgroundColor: "#F9F3F6" },
+  searchRow: { flexDirection: "row", alignItems: "center", marginBottom: 30 },
+  iconUserContainer: { paddingRight: 10 },
+  userPhoto: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, borderColor: "#6B4226" },
+  searchBox: { flex: 1, flexDirection: "row", alignItems: "center", backgroundColor: "#fff", borderWidth: 1, borderColor: "#2C2C2C", borderRadius: 16, paddingHorizontal: 10 },
+  searchInput: { flex: 1, height: 40, color: "#6D6D6D", fontFamily: "Nunito_400Regular" },
+  searchIcon: { paddingLeft: 10 },
+  alerta: { color: "#D9534F", fontSize: 14, marginBottom: 15, marginLeft: 15, fontFamily: "Nunito_700Bold" },
+  linha: { justifyContent: "space-between", marginBottom: 10 },
+  cardVazio: { flex: 1, margin: 5, backgroundColor: "transparent" },
 
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  iconUserContainer: {
-    paddingRight: 10,
-  },
-  userPhoto: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#6B4226",
-  },
-  searchBox: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#2C2C2C",
-    borderRadius: 16,
-    paddingHorizontal: 10,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    color: "#6D6D6D",
-    fontFamily: "Nunito_400Regular",
-  },
-  searchIcon: {
-    paddingLeft: 10,
-  },
-
-  alerta: {
-    color: "#D9534F",
-    fontSize: 14,
-    marginBottom: 15,
-    marginLeft: 15,
-    fontFamily: "Nunito_700Bold",
-  },
-
-  linha: {
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-
-  cardVazio: {
-    flex: 1,
-    margin: 5,
-    backgroundColor: "transparent",
-  },
-
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
-    width: "90%",
-    alignItems: "center",
-    position: "relative",
-  },
-  modalStar: {
+  /** Botão de seta flutuante **/
+  scrollTopButton: {
     position: "absolute",
-    top: 15,
-    right: 15,
-    zIndex: 5,
+    bottom: 45,
+    right: 25,
+    backgroundColor: "#A3B18A",
+    padding: 14,
+    borderRadius: 30,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
-  imagemGrande: {
-    width: 220,
-    height: 220,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-  descricao: {
-    fontSize: 14,
-    textAlign: "center",
-    marginVertical: 10,
-    color: "#2C2C2C",
-    fontFamily: "Nunito_400Regular",
-  },
-  toxica: {
-    fontSize: 14,
-    color: "#D9534F",
-    textAlign: "center",
-    marginTop: 4,
-    fontFamily: "Nunito_700Bold",
-  },
-  botaoFechar: {
-    marginTop: 15,
-    backgroundColor: "#6B4226",
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-  },
-  botaoFecharTexto: {
-    color: "#fff",
-    fontFamily: "Nunito_700Bold",
-  },
-  nome: {
-    fontFamily: "Nunito_700Bold",
-    fontSize: 14,
-    textAlign: "center",
-    color: "#2C2C2C",
-    textTransform: "uppercase",
-  },
-  nomeCientifico: {
-    fontSize: 12,
-    fontStyle: "italic",
-    fontFamily: "Nunito_400Regular",
-    color: "#6D6D6D",
-    textAlign: "center",
-    marginTop: 2,
-  },
+
+  /** Modal **/
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 12, width: "90%", alignItems: "center", position: "relative" },
+  modalStar: { position: "absolute", top: 15, right: 15, zIndex: 5 },
+  imagemGrande: { width: 220, height: 220, borderRadius: 12, marginBottom: 10 },
+  descricao: { fontSize: 14, textAlign: "center", marginVertical: 10, color: "#2C2C2C", fontFamily: "Nunito_400Regular" },
+  toxica: { fontSize: 14, color: "#D9534F", textAlign: "center", marginTop: 4, fontFamily: "Nunito_700Bold" },
+  botaoFechar: { marginTop: 15, backgroundColor: "#6B4226", paddingVertical: 10, paddingHorizontal: 25, borderRadius: 8 },
+  botaoFecharTexto: { color: "#fff", fontFamily: "Nunito_700Bold" },
+  nome: { fontFamily: "Nunito_700Bold", fontSize: 14, textAlign: "center", color: "#2C2C2C", textTransform: "uppercase" },
+  nomeCientifico: { fontSize: 12, fontStyle: "italic", fontFamily: "Nunito_400Regular", color: "#6D6D6D", textAlign: "center", marginTop: 2 },
 });
