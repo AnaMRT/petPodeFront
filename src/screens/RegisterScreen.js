@@ -24,41 +24,47 @@ export default function RegisterScreen({ navigation }) {
   const { login } = useContext(AuthContext);
   const { fetchUser } = useContext(UserContext);
 
-  const handleRegister = async () => {
-    if (!nome || !email || !senha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
-    }
+ const handleRegister = async () => {
+  if (!nome || !email || !senha) {
+    Alert.alert("Erro", "Preencha todos os campos.");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const response = await api.post("/auth/cadastro", {
-        nome,
-        email,
-        senha,
-      });
+    await api.post("/auth/cadastro", {
+      nome,
+      email,
+      senha,
+    });
 
-      const token = response.data.token;
+    const loginResponse = await api.post("/auth/login", {
+      email,
+      senha,
+    });
 
-      await login(token);
+    const { token } = loginResponse.data;
 
-      await fetchUser(token);
+    await login(token);
 
-      Alert.alert(
-        "Sucesso",
-        "Cadastro realizado com sucesso! Agora você pode adicionar sua foto no perfil."
-      );
+    await fetchUser(token);
 
-      navigation.navigate("Cadastro de Pets");
+    Alert.alert(
+      "Sucesso",
+      "Cadastro realizado com sucesso! Agora você pode adicionar sua foto no perfil."
+    );
 
-    } catch (error) {
-      console.error(" Erro no cadastro:", error.response?.data || error);
-      Alert.alert("Erro", "Não foi possível cadastrar o usuário.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    navigation.navigate("Cadastro de Pets");
+
+  } catch (error) {
+    console.error(" Erro no cadastro:", error.response?.data || error);
+    Alert.alert("Erro", "Não foi possível cadastrar o usuário.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <ScreenWrapper>
