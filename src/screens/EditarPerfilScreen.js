@@ -86,8 +86,6 @@ export default function EditarPerfilScreen({ navigation }) {
               await api.delete("/usuario", {
                 headers: { Authorization: `Bearer ${token}` },
               });
-
-              // Limpar tudo
               await AsyncStorage.clear();
               setUser(null);
 

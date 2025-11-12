@@ -8,7 +8,7 @@ export default function PlantCard({ planta, onPress, isFavorite = false, onToggl
   const [favorito, setFavorito] = useState(isFavorite);
 
   useEffect(() => {
-    setFavorito(isFavorite); // Mantém o estado sincronizado ao receber props
+    setFavorito(isFavorite); 
   }, [isFavorite]);
 
   const toggleFavorite = async () => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
-import HomeScreen from "./HomeScreen"; // sua tela
+import HomeScreen from "./HomeScreen"; 
 import { View, Text } from "react-native";
 
 function PerfilScreen() {

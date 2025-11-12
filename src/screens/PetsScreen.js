@@ -32,8 +32,6 @@ export default function PetsScreen({ navigation }) {
   const [uploading, setUploading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [petSelecionado, setPetSelecionado] = useState(null);
-
-  // Novo: controle do scroll
   const [showButton, setShowButton] = useState(false);
   const flatListRef = useRef(null);
 
@@ -145,7 +143,6 @@ export default function PetsScreen({ navigation }) {
   const abrirCadastroPet = () => navigation.navigate("Cadastro de Pets");
   const abrirEditarPet = (pet) =>navigation.navigate("EditarPetScreen", { pet });
 
-  // Funções do botão de scroll
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     setShowButton(offsetY > 200);
@@ -254,7 +251,6 @@ export default function PetsScreen({ navigation }) {
               contentContainerStyle={{ paddingBottom: 30 }}
             />
 
-            {/* Modal de troca de foto */}
             <PhotoPickerModalPet
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
@@ -276,7 +272,6 @@ export default function PetsScreen({ navigation }) {
               />
             )}
 
-            {/* Botão flutuante para subir */}
             {showButton && (
               <TouchableOpacity
                 style={styles.scrollTopButton}

@@ -25,7 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthContext } from "../context/AuthContext"; // 👈 IMPORTANTE
+import { AuthContext } from "../context/AuthContext"; 
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");

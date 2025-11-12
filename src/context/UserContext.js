@@ -6,7 +6,7 @@ import api from "../../api";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);       // Dados do usuário
+  const [user, setUser] = useState(null);      
   const [userPhoto, setUserPhoto] = useState(null);
   const { user: authUser, loading } = useContext(AuthContext);
 
@@ -58,7 +58,6 @@ export const UserProvider = ({ children }) => {
       name: "perfil.jpg",
     });
 
-    // Envia a imagem
     await api.put("/usuario/imagem", formData, {
       headers: {
         Authorization: `Bearer ${authUser.token}`,
@@ -66,16 +65,13 @@ export const UserProvider = ({ children }) => {
       },
     });
 
-    console.log("✅ Foto enviada com sucesso. Recarregando usuário...");
-
-    // Aqui está a diferença importante:
-    // força carregar o usuário atualizado do backend
+    console.log("Foto enviada com sucesso. Recarregando usuário...");
     await fetchUser(authUser.token);
 
     return true;
 
   } catch (error) {
-    console.error("❌ Erro ao enviar imagem:", error.response?.data || error);
+    console.error("Erro ao enviar imagem:", error.response?.data || error);
     return false;
   }
 };

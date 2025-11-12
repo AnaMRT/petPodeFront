@@ -11,7 +11,6 @@ import {
 } from "@expo/vector-icons";
 import { AuthProvider } from "./src/context/AuthContext";
 
-// 🔹 Telas
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import RegisterScreenPet from "./src/screens/RegisterScreenPet";
@@ -23,11 +22,9 @@ import EditarPetScreen from "./src/screens/EditarPetScreen";
 import EditarPerfilScreen from "./src/screens/EditarPerfilScreen";
 import PlanoScreen from "./src/screens/PlanoScreen";
 
-// 🔹 Contextos
 import { UserProvider } from "./src/context/UserContext";
 import { PetsProvider } from "./src/context/PetsContext";
 
-// 🔹 Drawer customizado (com foto, galeria, câmera e avatares)
 import CustomDrawerContent from "./src/components/CustomDrawerContent";
 import InfosScreen from "./src/screens/InfosScreen";
 
@@ -36,7 +33,6 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
-// 🔹 Tabs inferiores
 function TabRoutes() {
   const [isKeyboardVisible, setKeyboardVisible] = React.useState(false);
 
@@ -117,7 +113,6 @@ function TabRoutes() {
   );
 }
 
-// 🔹 Drawer lateral
 function DrawerRoutes() {
   return (
     <Drawer.Navigator
@@ -129,8 +124,6 @@ function DrawerRoutes() {
     </Drawer.Navigator>
   );
 }
-
-// 🔹 App principal (com providers)
 
 export default function App() {
   return (

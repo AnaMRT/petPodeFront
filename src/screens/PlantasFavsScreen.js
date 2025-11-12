@@ -104,7 +104,7 @@ export default function PlantasFavsScreen({ navigation }) {
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setMostrarBotaoTopo(offsetY > 250); // mostra botão após 250px de rolagem
+    setMostrarBotaoTopo(offsetY > 250); 
   };
 
   const rolarParaTopo = () => {
@@ -152,8 +152,6 @@ export default function PlantasFavsScreen({ navigation }) {
           )}
         </>
       )}
-
-      {/* Modal de detalhes */}
       <Modal visible={modalVisible} animationType="fade" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>

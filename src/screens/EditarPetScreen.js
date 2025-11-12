@@ -17,7 +17,7 @@ export default function EditarPetScreen({ route, navigation }) {
     }
 
     try {
-      const token = await AsyncStorage.getItem("userToken"); // ✅ CORRIGIDO
+      const token = await AsyncStorage.getItem("userToken"); 
       await api.put(`/pet/${pet.id}`, { nome, especie }, {
         headers: { Authorization: `Bearer ${token}` },
       });
