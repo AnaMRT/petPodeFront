@@ -11,7 +11,6 @@ export default function RegisterScreenPet({ navigation }) {
   const [value, setValue] = useState(null);
 
   const handleRegisterPet = async () => {
-    // 🔹 Verifica se os campos estão preenchidos
     if (!nome.trim() || !value) {
       Alert.alert("Atenção", "Por favor, preencha o nome e selecione a espécie do pet.");
       return;

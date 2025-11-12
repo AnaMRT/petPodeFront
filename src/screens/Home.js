@@ -112,7 +112,7 @@ export default function HomeScreen({ navigation }) {
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setShowButton(offsetY > 200); // Mostra o botão depois de rolar 200px
+    setShowButton(offsetY > 200); 
   };
 
   const scrollToTop = () => {
@@ -226,8 +226,6 @@ const styles = StyleSheet.create({
   alerta: { color: "#D9534F", fontSize: 14, marginBottom: 15, marginLeft: 15, fontFamily: "Nunito_700Bold" },
   linha: { justifyContent: "space-between", marginBottom: 10 },
   cardVazio: { flex: 1, margin: 5, backgroundColor: "transparent" },
-
-  /** Botão de seta flutuante **/
   scrollTopButton: {
     position: "absolute",
     bottom: 45,
@@ -241,8 +239,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
-
-  /** Modal **/
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 12, width: "90%", alignItems: "center", position: "relative" },
   modalStar: { position: "absolute", top: 15, right: 15, zIndex: 5 },

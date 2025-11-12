@@ -7,7 +7,7 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 import { AuthContext } from "../context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { avatars } from "../../assets/avatars/avatarList"; // ✅ lista de avatares prontos
+import { avatars } from "../../assets/avatars/avatarList"; 
 
 export default function CustomDrawerContent() {
   const { user, userPhoto, setUserPhoto } = useContext(UserContext);
@@ -53,8 +53,6 @@ export default function CustomDrawerContent() {
   }
 };
 
-
-  // Logout
   const handleLogout = async () => {
     await logout();
     navigation.dispatch(
@@ -67,9 +65,8 @@ export default function CustomDrawerContent() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* === HEADER === */}
       <View style={styles.headerContainer}>
-        {/* FOTO + INFO */}
+
         <View style={styles.userRow}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Image
@@ -80,7 +77,6 @@ export default function CustomDrawerContent() {
             />
           </TouchableOpacity>
 
-          {/* NOME + EMAIL */}
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.nome?.toUpperCase() || "NOME"}</Text>
             <Text style={styles.userEmail}>{user?.email || "email@exemplo.com"}</Text>
@@ -101,7 +97,6 @@ export default function CustomDrawerContent() {
         </TouchableOpacity>
       </View>
 
-      {/* LOGOUT + AJUDA */}
       <View style={styles.bottomContainer}>
         <View
           style={{
@@ -126,7 +121,6 @@ export default function CustomDrawerContent() {
         </View>
       </View>
 
-      {/* MODAL */}
       <PhotoPickerModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
