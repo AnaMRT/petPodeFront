@@ -1,32 +1,31 @@
 import React from "react";
-import { View, Text, Keyboard } from "react-native";
+import {  Keyboard } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import {
   MaterialCommunityIcons,
-  FontAwesome5,
   Ionicons,
 } from "@expo/vector-icons";
-import { AuthProvider } from "./src/context/AuthContext";
+import { AuthProvider } from "./src/context/authContext/AuthContext";
 
-import LoginScreen from "./src/screens/LoginScreen";
-import RegisterScreen from "./src/screens/RegisterScreen";
-import RegisterScreenPet from "./src/screens/RegisterScreenPet";
-import ResetSenhaScreen from "./src/screens/ResetSenhaScreen";
-import PetsScreen from "./src/screens/PetsScreen";
-import PlantasFavsScreen from "./src/screens/PlantasFavsScreen";
-import Home from "./src/screens/Home";
-import EditarPetScreen from "./src/screens/EditarPetScreen";
-import EditarPerfilScreen from "./src/screens/EditarPerfilScreen";
-import PlanoScreen from "./src/screens/PlanoScreen";
+import LoginScreen from "./src/screens/login/LoginScreen";
+import RegisterScreen from "./src/screens/cadastroUsuario/RegisterScreen";
+import RegisterScreenPet from "./src/screens/cadastroPet/RegisterScreenPet";
+import ResetSenhaScreen from "./src/screens/resetSenha/ResetSenhaScreen";
+import PetsScreen from "./src/screens/telaPet/PetsScreen";
+import PlantasFavsScreen from "./src/screens/telaFavoritos/PlantasFavsScreen";
+import Home from "./src/screens/home/Home";
+import EditarPetScreen from "./src/screens/editarPet/EditarPetScreen";
+import EditarPerfilScreen from "./src/screens/editarUsuario/EditarPerfilScreen";
+import PlanoScreen from "./src/screens/telaplano/PlanoScreen";
 
-import { UserProvider } from "./src/context/UserContext";
-import { PetsProvider } from "./src/context/PetsContext";
+import { UserProvider } from "./src/context/userContext/UserContext";
+import { PetsProvider } from "./src/context/petsContext/PetsContext";
 
-import CustomDrawerContent from "./src/components/CustomDrawerContent";
-import InfosScreen from "./src/screens/InfosScreen";
+import CustomDrawerContent from "./src/components/customDrawer/CustomDrawerContent";
+import InfosScreen from "./src/screens/infos/InfosScreen";
 
 
 const Stack = createStackNavigator();
