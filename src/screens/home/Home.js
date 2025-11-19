@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndicator,
+  View, Alert, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndicator,
   Keyboard, Modal, Animated
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { UserContext } from "../../context/userContext/UserContext.js";
 import PlantCard from "../../components/plantCard/PlantCard.js";
 import { useFocusEffect } from "@react-navigation/native";
+import { PlanoContext } from "../../context/planoContext/PlanoContext.js"; 
 import HomeStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
 
@@ -21,6 +22,8 @@ export default function HomeScreen({ navigation }) {
   const [plantaSelecionada, setPlantaSelecionada] = useState(null);
   const [favoritosIds, setFavoritosIds] = useState([]);
   const { userPhoto } = useContext(UserContext);
+
+  const { isAssinante } = useContext(PlanoContext); 
 
   const flatListRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -83,8 +86,15 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleToggleFavorite = async (plantaId, isFavorito) => {
+
+    if (!isAssinante) {
+      Alert.alert("Recurso exclusivo", "Assine o plano para favoritar plantas ");
+      return;
+    }
+
     try {
-      const token = await AsyncStorage.getItem("usertoken");
+      const token = await AsyncStorage.getItem("userToken");
+
       if (isFavorito) {
         await api.put(`/favoritos/${plantaId}`, null, { headers: { Authorization: `Bearer ${token}` } });
         setFavoritosIds((prev) => [...prev, plantaId]);
@@ -92,6 +102,7 @@ export default function HomeScreen({ navigation }) {
         await api.delete(`/favoritos/${plantaId}`, { headers: { Authorization: `Bearer ${token}` } });
         setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
       }
+
     } catch (error) {
       console.error("Erro ao atualizar favorito:", error);
     }
@@ -114,7 +125,7 @@ export default function HomeScreen({ navigation }) {
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setShowButton(offsetY > 200); 
+    setShowButton(offsetY > 200);
   };
 
   const scrollToTop = () => {
@@ -131,6 +142,7 @@ export default function HomeScreen({ navigation }) {
               style={HomeStyles.userPhoto}
             />
           </TouchableOpacity>
+
           <View style={HomeStyles.searchBox}>
             <TextInput
               style={HomeStyles.searchInput}
@@ -176,17 +188,24 @@ export default function HomeScreen({ navigation }) {
         <Modal visible={modalVisible} animationType="fade" transparent={true}>
           <View style={Global.modalContainer}>
             <View style={Global.modalContent}>
+
               {plantaSelecionada && (
                 <>
                   <Image source={{ uri: plantaSelecionada.imagemUrl }} style={Global.imagemGrande} />
+
                   <TouchableOpacity
                     style={Global.modalStar}
-                    onPress={() =>
+                    onPress={() => {
+                      if (!isAssinante) {
+                        Alert.alert("Recurso exclusivo", "Assine o plano para favoritar plantas ");
+                        return;
+                      }
+
                       handleToggleFavorite(
                         plantaSelecionada.id,
                         !favoritosIds.includes(plantaSelecionada.id)
-                      )
-                    }
+                      );
+                    }}
                   >
                     <Ionicons
                       name={favoritosIds.includes(plantaSelecionada.id) ? "star" : "star-outline"}
@@ -198,6 +217,7 @@ export default function HomeScreen({ navigation }) {
                   <Text style={Global.nome}>{plantaSelecionada.nomePopular}</Text>
                   <Text style={Global.nomeCientifico}>{plantaSelecionada.nomeCientifico}</Text>
                   <Text style={Global.descricao}>{plantaSelecionada.descricao}</Text>
+
                   <Text style={Global.toxica}>
                     {plantaSelecionada.toxicaParaCaninos ? "Tóxica para cães\n" : ""}
                     {plantaSelecionada.toxicaParaFelinos ? "Tóxica para gatos" : ""}
@@ -208,6 +228,7 @@ export default function HomeScreen({ navigation }) {
                   </TouchableOpacity>
                 </>
               )}
+
             </View>
           </View>
         </Modal>

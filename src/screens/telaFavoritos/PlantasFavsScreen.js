@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Modal,
   Image,
   TouchableOpacity,
-  Animated,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../../api";
@@ -16,6 +15,7 @@ import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper";
 import PlantCard from "../../components/plantCard/PlantCard";
 import { Ionicons } from "@expo/vector-icons";
 import Global from "../../components/estilos/Styles";
+import { PlanoContext } from "../../context/planoContext/PlanoContext";
 
 export default function PlantasFavsScreen({ navigation }) {
   const [favoritas, setFavoritas] = useState([]);
@@ -24,16 +24,18 @@ export default function PlantasFavsScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [plantaSelecionada, setPlantaSelecionada] = useState(null);
   const [mostrarBotaoTopo, setMostrarBotaoTopo] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef(null);
+  const { isAssinante } = useContext(PlanoContext);
 
   const carregarFavoritas = async () => {
     try {
       setCarregando(true);
       const token = await AsyncStorage.getItem("userToken");
+
       const response = await api.get("/favoritos", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setFavoritas(response.data);
       setFavoritosIds(response.data.map((p) => p.id));
     } catch (error) {
@@ -49,21 +51,56 @@ export default function PlantasFavsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
+  useEffect(() => {
+    const cancelarFavoritos = async () => {
+      if (!isAssinante) {
+        try {
+          const token = await AsyncStorage.getItem("userToken");
+          for (const planta of favoritas) {
+            await api.delete(`/favoritos/${planta.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+          }
+
+          setFavoritas([]);
+          setFavoritosIds([]);
+
+          console.log("Favoritos removidos após cancelar o plano.");
+        } catch (error) {
+          console.error("Erro ao limpar favoritas:", error);
+        }
+      }
+    };
+
+    cancelarFavoritos();
+  }, [isAssinante]);
+
   const handleToggleFavorite = async (plantaId, isFavorito) => {
+    if (!isAssinante) {
+      Alert.alert(
+        "Recurso exclusivo",
+        "Este recurso é exclusivo para assinantes"
+      );
+      return;
+    }
+
     try {
-      const token = await AsyncStorage.getItem("usertoken");
+      const token = await AsyncStorage.getItem("userToken");
 
       if (isFavorito) {
         await api.put(`/favoritos/${plantaId}`, null, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         setFavoritosIds((prev) => [...prev, plantaId]);
+
         const planta = favoritas.find((p) => p.id === plantaId);
         if (planta) setFavoritas((prev) => [...prev, planta]);
       } else {
         await api.delete(`/favoritos/${plantaId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
         setFavoritas((prev) => prev.filter((p) => p.id !== plantaId));
         setTimeout(() => setModalVisible(false), 100);
@@ -74,17 +111,21 @@ export default function PlantasFavsScreen({ navigation }) {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <PlantCard
-      planta={item}
-      onPress={() => {
-        setPlantaSelecionada(item);
-        setModalVisible(true);
-      }}
-      isFavorite={favoritosIds.includes(item.id)}
-      onToggleFavorite={handleToggleFavorite}
-    />
-  );
+  const renderItem = ({ item }) =>
+    item.id === "vazio" ? (
+      <View style={Global.cardVazio} />
+    ) : (
+      <PlantCard
+        planta={item}
+        onPress={() => {
+          setPlantaSelecionada(item);
+          setModalVisible(true);
+        }}
+        isFavorite={favoritosIds.includes(item.id)}
+        onToggleFavorite={handleToggleFavorite}
+        isAssinante={isAssinante}
+      />
+    );
 
   if (carregando) {
     return (
@@ -98,18 +139,15 @@ export default function PlantasFavsScreen({ navigation }) {
   }
 
   const favoritasComEspaco = [...favoritas];
-  if (favoritas.length % 2 !== 0) {
-    favoritasComEspaco.push({ id: "vazio" });
-  }
+  if (favoritas.length % 2 !== 0) favoritasComEspaco.push({ id: "vazio" });
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setMostrarBotaoTopo(offsetY > 250); 
+    setMostrarBotaoTopo(offsetY > 250);
   };
 
-  const rolarParaTopo = () => {
+  const rolarParaTopo = () =>
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-  };
 
   return (
     <ScreenWrapper>
@@ -127,23 +165,20 @@ export default function PlantasFavsScreen({ navigation }) {
             ref={flatListRef}
             data={favoritasComEspaco}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) =>
-              item.id === "vazio" ? (
-                <View style={[Global.cardVazio]} />
-              ) : (
-                renderItem({ item })
-              )
-            }
+            renderItem={renderItem}
             numColumns={2}
             columnWrapperStyle={Global.linha}
-            contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 20 }}
+            contentContainerStyle={{
+              paddingBottom: 30,
+              paddingHorizontal: 20,
+            }}
             onScroll={handleScroll}
             scrollEventThrottle={16}
           />
 
           {mostrarBotaoTopo && (
             <TouchableOpacity
-              style={Global.scrollTopButton}
+              style={Global.botaoTopo}
               onPress={rolarParaTopo}
               activeOpacity={0.8}
             >
@@ -152,6 +187,7 @@ export default function PlantasFavsScreen({ navigation }) {
           )}
         </>
       )}
+
       <Modal visible={modalVisible} animationType="fade" transparent={true}>
         <View style={Global.modalContainer}>
           <View style={Global.modalContent}>
@@ -161,6 +197,7 @@ export default function PlantasFavsScreen({ navigation }) {
                   source={{ uri: plantaSelecionada.imagemUrl }}
                   style={Global.imagemGrande}
                 />
+
                 <TouchableOpacity
                   style={Global.modalStar}
                   onPress={() =>
@@ -181,9 +218,7 @@ export default function PlantasFavsScreen({ navigation }) {
                   />
                 </TouchableOpacity>
 
-                <Text style={Global.nome}>
-                  {plantaSelecionada.nomePopular}
-                </Text>
+                <Text style={Global.nome}>{plantaSelecionada.nomePopular}</Text>
                 <Text style={Global.nomeCientifico}>
                   {plantaSelecionada.nomeCientifico}
                 </Text>
