@@ -55,6 +55,17 @@ const Styles = StyleSheet.create({
     borderRadius: 20,
     padding: 14,
   },
+  buttonCancelar: {
+    backgroundColor: "#ffdddd",
+    borderRadius: 12,
+    paddingVertical: 12,
+  },
+  buttonCancelarText: {
+    color: "#D9534F",
+    fontSize: 18,
+    textAlign: "center",
+    fontFamily: "Nunito_700Bold",
+  },
 });
 
 export default Styles;

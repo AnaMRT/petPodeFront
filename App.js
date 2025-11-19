@@ -1,13 +1,10 @@
 import React from "react";
-import {  Keyboard } from "react-native";
+import { Keyboard } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import {
-  MaterialCommunityIcons,
-  Ionicons,
-} from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { AuthProvider } from "./src/context/authContext/AuthContext";
 
 import LoginScreen from "./src/screens/login/LoginScreen";
@@ -23,6 +20,7 @@ import PlanoScreen from "./src/screens/telaplano/PlanoScreen";
 
 import { UserProvider } from "./src/context/userContext/UserContext";
 import { PetsProvider } from "./src/context/petsContext/PetsContext";
+import { PlanoProvider } from "./src/context/planoContext/PlanoContext";
 
 import CustomDrawerContent from "./src/components/customDrawer/CustomDrawerContent";
 import InfosScreen from "./src/screens/infos/InfosScreen";
@@ -56,18 +54,18 @@ function TabRoutes() {
         tabBarStyle: isKeyboardVisible
           ? { display: "none" }
           : {
-            height: 70,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            borderWidth: 1,
-            borderColor: "#A3B18A",
-            backgroundColor: "#F9F3F6",
-            marginTop: -40,
-            shadowColor: "#000",
-            shadowOpacity: 0.05,
-            shadowRadius: 4,
-            elevation: 2,
-          },
+              height: 70,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              borderWidth: 1,
+              borderColor: "#A3B18A",
+              backgroundColor: "#F9F3F6",
+              marginTop: -40,
+              shadowColor: "#000",
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            },
         tabBarActiveTintColor: "#6B4226",
         tabBarInactiveTintColor: "#A3B18A",
       }}
@@ -77,7 +75,11 @@ function TabRoutes() {
         component={PlanoScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="crown-outline" size={24} color={color} />
+            <MaterialCommunityIcons
+              name="crown-outline"
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -128,25 +130,80 @@ export default function App() {
   return (
     <AuthProvider>
       <UserProvider>
-        <PetsProvider>
-          <NavigationContainer>
-            <Stack.Navigator
-              initialRouteName="Login"
-              screenOptions={{ headerShown: false }}
-            >
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen name="Cadastro" component={RegisterScreen} />
-              <Stack.Screen name="Cadastro de Pets" component={RegisterScreenPet} />
-              <Stack.Screen name="PetsScreen" component={PetsScreen} />
-              <Stack.Screen name="EditarPetScreen" component={EditarPetScreen} options={{ headerShown: true, title: "EDITAR PET", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", }, headerTitleStyle: { color: "#2C2C2C", fontSize: 34, fontFamily: "PlayfairDisplay_700Bold", } }} />
-              <Stack.Screen name="EditarPerfilScreen" component={EditarPerfilScreen} options={{ headerShown: true, title: "EDITAR PERFIL", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", }, headerTitleStyle: { color: "#2C2C2C", fontSize: 34, fontFamily: "PlayfairDisplay_700Bold", } }} />
-              <Stack.Screen name="ResetSenha" component={ResetSenhaScreen} options={{ headerShown: true, title: "", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", } }} />
-              <Stack.Screen name="Home" component={DrawerRoutes} />
-              <Stack.Screen name="InfosScreen" component={InfosScreen} options={{ headerShown: true, title: "", headerBackTitleVisible: false, headerTintColor: "#2C2C2C", headerStyle: { backgroundColor: "#F9F3F6", } }} />
-              <Stack.Screen name="Plano" component={PlanoScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </PetsProvider>
+        <PlanoProvider>
+          <PetsProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                initialRouteName="Login"
+                screenOptions={{ headerShown: false }}
+              >
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="Cadastro" component={RegisterScreen} />
+                <Stack.Screen
+                  name="Cadastro de Pets"
+                  component={RegisterScreenPet}
+                />
+                <Stack.Screen name="PetsScreen" component={PetsScreen} />
+                <Stack.Screen
+                  name="EditarPetScreen"
+                  component={EditarPetScreen}
+                  options={{
+                    headerShown: true,
+                    title: "EDITAR PET",
+                    headerBackTitleVisible: false,
+                    headerTintColor: "#2C2C2C",
+                    headerStyle: { backgroundColor: "#F9F3F6" },
+                    headerTitleStyle: {
+                      color: "#2C2C2C",
+                      fontSize: 34,
+                      fontFamily: "PlayfairDisplay_700Bold",
+                    },
+                  }}
+                />
+                <Stack.Screen
+                  name="EditarPerfilScreen"
+                  component={EditarPerfilScreen}
+                  options={{
+                    headerShown: true,
+                    title: "EDITAR PERFIL",
+                    headerBackTitleVisible: false,
+                    headerTintColor: "#2C2C2C",
+                    headerStyle: { backgroundColor: "#F9F3F6" },
+                    headerTitleStyle: {
+                      color: "#2C2C2C",
+                      fontSize: 34,
+                      fontFamily: "PlayfairDisplay_700Bold",
+                    },
+                  }}
+                />
+                <Stack.Screen
+                  name="ResetSenha"
+                  component={ResetSenhaScreen}
+                  options={{
+                    headerShown: true,
+                    title: "",
+                    headerBackTitleVisible: false,
+                    headerTintColor: "#2C2C2C",
+                    headerStyle: { backgroundColor: "#F9F3F6" },
+                  }}
+                />
+                <Stack.Screen name="Home" component={DrawerRoutes} />
+                <Stack.Screen
+                  name="InfosScreen"
+                  component={InfosScreen}
+                  options={{
+                    headerShown: true,
+                    title: "",
+                    headerBackTitleVisible: false,
+                    headerTintColor: "#2C2C2C",
+                    headerStyle: { backgroundColor: "#F9F3F6" },
+                  }}
+                />
+                <Stack.Screen name="Plano" component={PlanoScreen} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </PetsProvider>
+        </PlanoProvider>
       </UserProvider>
     </AuthProvider>
   );

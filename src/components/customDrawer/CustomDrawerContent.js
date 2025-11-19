@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { View, Image, Text, TouchableOpacity} from "react-native";
+import { View, Image, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { UserContext } from "../../context/userContext/UserContext.js";
 import PhotoPickerModal from "../photoPicker/PhotoPickerModal";
@@ -7,7 +7,7 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 import { AuthContext } from "../../context/authContext/AuthContext.js";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { avatars } from "../../../assets/avatars/avatarList"; 
+import { avatars } from "../../../assets/avatars/avatarList";
 import CustomDrawerStyles from "./Styles.js";
 
 export default function CustomDrawerContent() {
@@ -15,26 +15,40 @@ export default function CustomDrawerContent() {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
   const { logout } = useContext(AuthContext);
+  const [uploading, setUploading] = useState(false);
 
   const handleSelectAvatar = async (avatar) => {
+  try {
+    setUploading(true);
     const avatarUri = Image.resolveAssetSource(avatar).uri;
     await setUserPhoto(avatarUri);
-    setModalVisible(false);
-  };
+  } finally {
+    setUploading(false);
+  }
+  setModalVisible(false);
+};
 
-  const pickFromGallery = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-    if (!result.canceled) {
+
+ const pickFromGallery = async () => {
+  const result = await ImagePicker.launchImageLibraryAsync({
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 1,
+  });
+
+  if (!result.canceled) {
+    try {
+      setUploading(true);
       await setUserPhoto(result.assets[0].uri);
-      setModalVisible(false);
+    } finally {
+      setUploading(false);
     }
-  };
+    setModalVisible(false);
+  }
+};
 
- const pickFromCamera = async () => {
+
+  const pickFromCamera = async () => {
   const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
   if (status !== "granted") {
@@ -49,7 +63,12 @@ export default function CustomDrawerContent() {
   });
 
   if (!result.canceled) {
-    await setUserPhoto(result.assets[0].uri);
+    try {
+      setUploading(true);
+      await setUserPhoto(result.assets[0].uri);
+    } finally {
+      setUploading(false);
+    }
     setModalVisible(false);
   }
 };
@@ -66,21 +85,26 @@ export default function CustomDrawerContent() {
 
   return (
     <SafeAreaView style={CustomDrawerStyles.container}>
-      <View style={CustomDrawerStyles.headerContainer}>
-
+        <View style={CustomDrawerStyles.headerContainer}>
         <View style={CustomDrawerStyles.userRow}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Image
               source={
-                userPhoto ? { uri: userPhoto } : require("../../../assets/user-placeholder.png")
+                userPhoto
+                  ? { uri: userPhoto }
+                  : require("../../../assets/user-placeholder.png")
               }
               style={CustomDrawerStyles.photo}
             />
           </TouchableOpacity>
 
           <View style={CustomDrawerStyles.userInfo}>
-            <Text style={CustomDrawerStyles.userName}>{user?.nome?.toUpperCase() || "NOME"}</Text>
-            <Text style={CustomDrawerStyles.userEmail}>{user?.email || "email@exemplo.com"}</Text>
+            <Text style={CustomDrawerStyles.userName}>
+              {user?.nome?.toUpperCase() || "NOME"}
+            </Text>
+            <Text style={CustomDrawerStyles.userEmail}>
+              {user?.email || "email@exemplo.com"}
+            </Text>
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <Text style={CustomDrawerStyles.changeText}>Alterar Foto</Text>
             </TouchableOpacity>
@@ -108,7 +132,10 @@ export default function CustomDrawerContent() {
             paddingRight: 20,
           }}
         >
-          <TouchableOpacity style={CustomDrawerStyles.bottomRowButton} onPress={handleLogout}>
+          <TouchableOpacity
+            style={CustomDrawerStyles.bottomRowButton}
+            onPress={handleLogout}
+          >
             <Feather name="log-out" size={30} color="#6B4226" />
             <Text style={CustomDrawerStyles.menuText}>Sair</Text>
           </TouchableOpacity>
@@ -130,6 +157,19 @@ export default function CustomDrawerContent() {
         onPickCamera={pickFromCamera}
         title="Escolha sua foto de perfil"
       />
+      {uploading && (
+        <ActivityIndicator
+          size="large"
+          color="#6B4226"
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            marginLeft: -12,
+            marginTop: -12,
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }
