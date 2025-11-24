@@ -37,8 +37,19 @@ export const PlanoProvider = ({ children }) => {
     }
   };
 
+  const resetarPlano = async () => {
+    try {
+      await AsyncStorage.removeItem("planoAtivo");
+      setIsAssinante(false);
+    } catch (err) {
+      console.log("Erro ao resetar plano:", err);
+    }
+  };
+
   return (
-    <PlanoContext.Provider value={{ isAssinante, assinarPlano, cancelarPlano }}>
+    <PlanoContext.Provider 
+      value={{ isAssinante, assinarPlano, cancelarPlano, resetarPlano }}
+    >
       {children}
     </PlanoContext.Provider>
   );

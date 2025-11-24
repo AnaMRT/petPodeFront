@@ -7,7 +7,6 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 import { AuthContext } from "../../context/authContext/AuthContext.js";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { avatars } from "../../../assets/avatars/avatarList";
 import CustomDrawerStyles from "./Styles.js";
 
 export default function CustomDrawerContent() {

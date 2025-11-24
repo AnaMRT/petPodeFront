@@ -12,6 +12,7 @@ import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
 import api from "../../../api";
 import { AuthContext } from "../../context/authContext/AuthContext.js";
 import { UserContext } from "../../context/userContext/UserContext.js";
+import { PlanoContext } from "../../context/planoContext/PlanoContext.js";
 import CadastroUsuarioStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
 
@@ -21,6 +22,8 @@ export default function RegisterScreen({ navigation }) {
   const [senha, setSenha] = useState("");
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { resetarPlano } = useContext(PlanoContext);
+
 
   const { login } = useContext(AuthContext);
   const { fetchUser } = useContext(UserContext);
@@ -48,7 +51,7 @@ export default function RegisterScreen({ navigation }) {
     const { token } = loginResponse.data;
 
     await login(token);
-
+    resetarPlano();
     await fetchUser(token);
 
     Alert.alert(

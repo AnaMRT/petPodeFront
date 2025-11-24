@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"; 
+import React, { useState, useContext } from "react";
 import { useFonts } from "expo-font";
 import {
   PlayfairDisplay_400Regular,
@@ -13,18 +13,12 @@ import {
   Nunito_700Bold,
 } from "@expo-google-fonts/nunito";
 import { Button } from "react-native-elements";
-import {
-  View,
-  TextInput,
-  Text,
-  Alert,
-  TouchableOpacity,
-} from "react-native";
+import { View, TextInput, Text, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../../api";
 import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthContext } from "../../context/authContext/AuthContext.js"; 
+import { AuthContext } from "../../context/authContext/AuthContext.js";
 import LoginStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
 
@@ -39,9 +33,9 @@ export default function LoginScreen({ navigation }) {
       const response = await api.post("/auth/login", { email, senha });
       const token = response.data.token;
 
-  await AsyncStorage.setItem("userToken", token);
-await login(token);
-         Alert.alert("Login OK");
+      await AsyncStorage.setItem("userToken", token);
+      await login(token);
+      Alert.alert("Login OK");
       navigation.navigate("Home");
       await login(token);
 
@@ -61,7 +55,10 @@ await login(token);
     }
     try {
       await api.post(`/auth/forgot-password?email=${email}`);
-      Alert.alert("Verifique seu e-mail", "Enviamos um código para redefinição de senha.");
+      Alert.alert(
+        "Verifique seu e-mail",
+        "Enviamos um código para redefinição de senha."
+      );
       navigation.navigate("ResetSenha", { email });
     } catch (error) {
       Alert.alert("Erro", "Não foi possível enviar o e-mail.");
