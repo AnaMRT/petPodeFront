@@ -10,6 +10,7 @@ import { AuthProvider } from "./src/context/authContext/AuthContext";
 import { UserProvider } from "./src/context/userContext/UserContext";
 import { PetsProvider } from "./src/context/petsContext/PetsContext";
 import { PlanoProvider } from "./src/context/planoContext/PlanoContext";
+import { Platform } from "react-native";
 
 import LoginScreen from "./src/screens/login/LoginScreen";
 import RegisterScreen from "./src/screens/cadastroUsuario/RegisterScreen";
@@ -176,6 +177,7 @@ export default function App() {
                   options={{
                     headerShown: true,
                     title: "EDITAR PET",
+                    headerBackTitle: "",
                     headerBackTitleVisible: false,
                     headerTintColor: "#2C2C2C",
                     headerStyle: { backgroundColor: "#F9F3F6" },
@@ -183,6 +185,7 @@ export default function App() {
                       color: "#2C2C2C",
                       fontSize: 34,
                       fontFamily: "PlayfairDisplay_700Bold",
+                      fontSize: Platform.OS === "ios" ? 30 : 34,
                     },
                   }}
                 />
@@ -192,6 +195,7 @@ export default function App() {
                   options={{
                     headerShown: true,
                     title: "EDITAR PERFIL",
+                    headerBackTitle: "",            // ← força remover o “Home”
                     headerBackTitleVisible: false,
                     headerTintColor: "#2C2C2C",
                     headerStyle: { backgroundColor: "#F9F3F6" },
@@ -199,6 +203,7 @@ export default function App() {
                       color: "#2C2C2C",
                       fontSize: 34,
                       fontFamily: "PlayfairDisplay_700Bold",
+                      fontSize: Platform.OS === "ios" ? 30 : 34,
                     },
                   }}
                 />
@@ -220,6 +225,7 @@ export default function App() {
                   options={{
                     headerShown: true,
                     title: "",
+                    headerBackTitle: "",
                     headerBackTitleVisible: false,
                     headerTintColor: "#2C2C2C",
                     headerStyle: { backgroundColor: "#F9F3F6" },
