@@ -45,6 +45,7 @@ export default function ResetSenhaScreen({ route, navigation }) {
       <TextInput
         style={Global.input}
         placeholder="CÓDIGO"
+        placeholderTextColor="#6D6D6D"
         value={codigo}
         onChangeText={setCodigo}
       />
@@ -52,6 +53,7 @@ export default function ResetSenhaScreen({ route, navigation }) {
         <TextInput
           style={{ flex: 1 }}
           placeholder="NOVA SENHA"
+          placeholderTextColor="#6D6D6D"
           secureTextEntry={!senhaVisivel}
           value={novaSenha}
           onChangeText={setNovaSenha}

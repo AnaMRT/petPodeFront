@@ -41,6 +41,7 @@ export default function EditarPetScreen({ route, navigation }) {
           onChangeText={setNome}
           style={Global.inputEditar}
           placeholder="Digite o nome do pet"
+          placeholderTextColor="#6D6D6D"
         />
 
         <Text style={Global.label}>Espécie</Text>

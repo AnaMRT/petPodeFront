@@ -133,6 +133,7 @@ export default function EditarPerfilScreen({ navigation }) {
         <TextInput
           style={Global.inputEditar}
           placeholder="Digite sua senha atual"
+          placeholderTextColor="#6D6D6D"
           secureTextEntry
           value={senhaAntiga}
           onChangeText={setSenhaAntiga}
@@ -142,6 +143,7 @@ export default function EditarPerfilScreen({ navigation }) {
         <TextInput
           style={Global.inputEditar}
           placeholder="Digite a nova senha"
+          placeholderTextColor="#6D6D6D"
           secureTextEntry
           value={novaSenha}
           onChangeText={setNovaSenha}
@@ -151,6 +153,7 @@ export default function EditarPerfilScreen({ navigation }) {
         <TextInput
           style={Global.inputEditar}
           placeholder="Confirme a nova senha"
+          placeholderTextColor="#6D6D6D"
           secureTextEntry
           value={confirmarSenha}
           onChangeText={setConfirmarSenha}
