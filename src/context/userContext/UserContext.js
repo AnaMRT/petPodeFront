@@ -53,9 +53,9 @@ export const UserProvider = ({ children }) => {
   try {
     const formData = new FormData();
     formData.append("file", {
-      uri,
-      type: "image/jpeg",
+      uri: imageUri,
       name: "perfil.jpg",
+      type: "image/jpeg",
     });
 
     await api.put("/usuario/imagem", formData, {
