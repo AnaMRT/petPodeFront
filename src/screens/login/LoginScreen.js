@@ -7,6 +7,7 @@ import api from "../../../api";
 import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../../context/authContext/AuthContext.js";
+import { Platform } from "react-native";
 import LoginStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
 
@@ -37,25 +38,30 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleForgotPassword = async () => {
-  if (!email) {
-    Alert.alert("Erro", "Digite seu e-mail primeiro.");
-    return;
-  }
+    if (!email) {
+      Alert.alert("Erro", "Digite seu e-mail primeiro.");
+      return;
+    }
 
-  try {
-    await api.post(`/auth/forgot-password?email=${email}`);
+    try {
+      await api.post(`/auth/forgot-password?email=${email}`);
 
-    Alert.alert(
-      "Verifique seu e-mail",
-      "Enviamos um código para redefinição de senha."
-    );
-    navigation.navigate("ResetSenha", { email });
-
-  } catch (error) {
-    console.log("Erro Android:", error?.response?.data || error.message || error);
-    Alert.alert("Erro", "Não foi possível conectar ao servidor ou enviar o e-mail.");
-  }
-};
+      Alert.alert(
+        "Verifique seu e-mail",
+        "Enviamos um código para redefinição de senha."
+      );
+      navigation.navigate("ResetSenha", { email });
+    } catch (error) {
+      console.log(
+        "Erro Android:",
+        error?.response?.data || error.message || error
+      );
+      Alert.alert(
+        "Erro",
+        "Não foi possível conectar ao servidor ou enviar o e-mail."
+      );
+    }
+  };
 
   return (
     <ScreenWrapper>
@@ -74,7 +80,13 @@ export default function LoginScreen({ navigation }) {
 
         <View style={Global.inputSenhaContainer}>
           <TextInput
-            style={{ flex: 1 }}
+            style={{
+              flex: 1,
+              paddingVertical: Platform.OS === "ios" ? 10 : 6,
+              fontFamily: "Nunito_400Regular", 
+              fontSize: 15, 
+              color: "#6D6D6D",
+            }}
             placeholder="SENHA"
             placeholderTextColor="#6D6D6D"
             secureTextEntry={!senhaVisivel}

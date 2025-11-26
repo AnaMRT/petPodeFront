@@ -12,6 +12,7 @@ import { UserContext } from "../../context/userContext/UserContext.js";
 import api from "../../../api";
 import EditarUsuarioStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
+import { color } from "react-native-elements/dist/helpers/index.js";
 
 export default function EditarPerfilScreen({ navigation }) {
   const { user, setUser } = useContext(UserContext);

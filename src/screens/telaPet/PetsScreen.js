@@ -249,7 +249,7 @@ export default function PetsScreen({ navigation }) {
               }
               onScroll={handleScroll}
               scrollEventThrottle={16}
-              contentContainerStyle={{ paddingBottom: 30 }}
+              contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 5 }}
             />
 
             <PhotoPickerModalPet
