@@ -78,6 +78,7 @@ export default function RegisterScreen({ navigation }) {
         <TextInput
           style={Global.input}
           placeholder="NOME"
+          placeholderTextColor="#6D6D6D"
           value={nome}
           onChangeText={setNome}
         />
@@ -85,6 +86,7 @@ export default function RegisterScreen({ navigation }) {
         <TextInput
           style={Global.input}
           placeholder="E-MAIL"
+          placeholderTextColor="6D6D6D"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -95,6 +97,7 @@ export default function RegisterScreen({ navigation }) {
           <TextInput
             style={{ flex: 1 }}
             placeholder="SENHA"
+            placeholderTextColor="#6D6D6D"
             secureTextEntry={!senhaVisivel}
             value={senha}
             onChangeText={setSenha}

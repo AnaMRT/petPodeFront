@@ -61,6 +61,7 @@ export default function LoginScreen({ navigation }) {
         <TextInput
           style={Global.input}
           placeholder="E-MAIL"
+          placeholderTextColor="#6D6D6D"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -71,6 +72,7 @@ export default function LoginScreen({ navigation }) {
           <TextInput
             style={{ flex: 1 }}
             placeholder="SENHA"
+            placeholderTextColor="#6D6D6D"
             secureTextEntry={!senhaVisivel}
             value={senha}
             onChangeText={setSenha}

@@ -50,6 +50,7 @@ export default function RegisterScreenPet({ navigation }) {
         <TextInput
           style={Global.input}
           placeholder="NOME"
+          placeholderTextColor="#6D6D6D"
           value={nome}
           onChangeText={setNome}
         />
