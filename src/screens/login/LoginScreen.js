@@ -37,21 +37,25 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleForgotPassword = async () => {
-    if (!email) {
-      Alert.alert("Erro", "Digite seu e-mail primeiro.");
-      return;
-    }
-    try {
-      await api.post(`/auth/forgot-password?email=${email}`);
-      Alert.alert(
-        "Verifique seu e-mail",
-        "Enviamos um código para redefinição de senha."
-      );
-      navigation.navigate("ResetSenha", { email });
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível enviar o e-mail.");
-    }
-  };
+  if (!email) {
+    Alert.alert("Erro", "Digite seu e-mail primeiro.");
+    return;
+  }
+
+  try {
+    await api.post(`/auth/forgot-password?email=${email}`);
+
+    Alert.alert(
+      "Verifique seu e-mail",
+      "Enviamos um código para redefinição de senha."
+    );
+    navigation.navigate("ResetSenha", { email });
+
+  } catch (error) {
+    console.log("Erro Android:", error?.response?.data || error.message || error);
+    Alert.alert("Erro", "Não foi possível conectar ao servidor ou enviar o e-mail.");
+  }
+};
 
   return (
     <ScreenWrapper>
