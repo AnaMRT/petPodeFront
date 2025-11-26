@@ -8,6 +8,7 @@ import { AuthContext } from "../../context/authContext/AuthContext.js";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import CustomDrawerStyles from "./Styles.js";
+import * as FileSystem from "expo-file-system";
 
 export default function CustomDrawerContent() {
   const { user, userPhoto, setUserPhoto } = useContext(UserContext);
@@ -59,12 +60,34 @@ export default function CustomDrawerContent() {
     allowsEditing: true,
     aspect: [1, 1],
     quality: 1,
+  }).catch((ex) => {
+    console.log("ex", ex);
   });
+
+  const uri = result.assets[0].uri;
+  const fileName = uri.split("/").pop();
+  console.log('result', result)
+  console.log('uri', uri)
+  console.log('fileName', fileName)
+
+  const destDir = FileSystem.Paths.document;
+  console.log('destDir', destDir);
+
+  // Arquivos (objeto File, não string)
+  const sourceFile = File.fromUri(uri);
+  console.log('sourceFile', sourceFile);
+
+  const destFile = new File(destDir, fileName);
+  console.log('destFile', destFile);
+
+  // Copiar para armazenamento seguro
+  await sourceFile.copyToAsync(destFile);
+  
 
   if (!result.canceled) {
     try {
       setUploading(true);
-      await setUserPhoto(result.assets[0].uri);
+      await setUserPhoto(destFile.uri);
     } finally {
       setUploading(false);
     }

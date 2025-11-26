@@ -5,7 +5,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+
 import { AuthProvider } from "./src/context/authContext/AuthContext";
+import { UserProvider } from "./src/context/userContext/UserContext";
+import { PetsProvider } from "./src/context/petsContext/PetsContext";
+import { PlanoProvider } from "./src/context/planoContext/PlanoContext";
 
 import LoginScreen from "./src/screens/login/LoginScreen";
 import RegisterScreen from "./src/screens/cadastroUsuario/RegisterScreen";
@@ -18,13 +22,23 @@ import EditarPetScreen from "./src/screens/editarPet/EditarPetScreen";
 import EditarPerfilScreen from "./src/screens/editarUsuario/EditarPerfilScreen";
 import PlanoScreen from "./src/screens/telaplano/PlanoScreen";
 
-import { UserProvider } from "./src/context/userContext/UserContext";
-import { PetsProvider } from "./src/context/petsContext/PetsContext";
-import { PlanoProvider } from "./src/context/planoContext/PlanoContext";
-
 import CustomDrawerContent from "./src/components/customDrawer/CustomDrawerContent";
 import InfosScreen from "./src/screens/infos/InfosScreen";
+import { useFonts } from "expo-font";
 
+import {
+  PlayfairDisplay_400Regular,
+  PlayfairDisplay_500Medium,
+  PlayfairDisplay_600SemiBold,
+  PlayfairDisplay_700Bold,
+} from "@expo-google-fonts/playfair-display";
+
+import {
+  Nunito_400Regular,
+  Nunito_500Medium,
+  Nunito_600SemiBold,
+  Nunito_700Bold,
+} from "@expo-google-fonts/nunito";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -127,6 +141,18 @@ function DrawerRoutes() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_500Medium,
+    PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_700Bold,
+    Nunito_400Regular,
+    Nunito_500Medium,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+  });
+
+  if (!fontsLoaded) return null; 
   return (
     <AuthProvider>
       <UserProvider>

@@ -4,10 +4,10 @@
     "slug": "petpode",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/PetPode-logo.png",
+    "icon": "./assets/PetPode-logo.jpeg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-      "scheme": "petpode", 
+    "scheme": "petpode",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -21,11 +21,16 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.patapin.petpode"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e38c1646-7fe6-4ee1-b227-15bdd2fd9b6e"
+      }
     }
-    
   }
 }

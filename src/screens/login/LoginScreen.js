@@ -1,17 +1,5 @@
 import React, { useState, useContext } from "react";
 import { useFonts } from "expo-font";
-import {
-  PlayfairDisplay_400Regular,
-  PlayfairDisplay_500Medium,
-  PlayfairDisplay_600SemiBold,
-  PlayfairDisplay_700Bold,
-} from "@expo-google-fonts/playfair-display";
-import {
-  Nunito_400Regular,
-  Nunito_500Medium,
-  Nunito_600SemiBold,
-  Nunito_700Bold,
-} from "@expo-google-fonts/nunito";
 import { Button } from "react-native-elements";
 import { View, TextInput, Text, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -64,18 +52,6 @@ export default function LoginScreen({ navigation }) {
       Alert.alert("Erro", "Não foi possível enviar o e-mail.");
     }
   };
-
-  const [fontsLoaded] = useFonts({
-    PlayfairDisplay_400Regular,
-    PlayfairDisplay_500Medium,
-    PlayfairDisplay_600SemiBold,
-    PlayfairDisplay_700Bold,
-    Nunito_400Regular,
-    Nunito_500Medium,
-    Nunito_600SemiBold,
-    Nunito_700Bold,
-  });
-  if (!fontsLoaded) return null;
 
   return (
     <ScreenWrapper>
