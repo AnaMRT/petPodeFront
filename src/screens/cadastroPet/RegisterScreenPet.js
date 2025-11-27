@@ -12,6 +12,16 @@ export default function RegisterScreenPet({ navigation }) {
   const [nome, setNome] = useState("");
   const [value, setValue] = useState(null);
 
+   const nomeMensagem = () => {
+    if (nome.length > 0 && nome.length < 2) {
+      return "O nome deve ter pelo menos 2 caracteres.";
+    }
+    if (nome.length > 100) {
+      return "O nome não pode ter mais de 100 caracteres.";
+    }
+    return "";
+  };
+
   const handleRegisterPet = async () => {
     if (!nome.trim() || !value) {
       Alert.alert("Atenção", "Por favor, preencha o nome e selecione a espécie do pet.");
@@ -54,6 +64,9 @@ export default function RegisterScreenPet({ navigation }) {
           value={nome}
           onChangeText={setNome}
         />
+         {nomeMensagem() ? (
+                <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text>
+              ) : null}
 
         <View style={Global.pickerContainer}>
           <Picker

@@ -12,6 +12,16 @@ export default function EditarPetScreen({ route, navigation }) {
   const [nome, setNome] = useState(pet?.nome || "");
   const [especie, setEspecie] = useState(pet?.especie || "");
 
+  const nomeMensagem = () => {
+    if (nome.length > 0 && nome.length < 2) {
+      return "O nome deve ter pelo menos 2 caracteres.";
+    }
+    if (nome.length > 100) {
+      return "O nome não pode ter mais de 100 caracteres.";
+    }
+    return "";
+  };
+
   const handleSave = async () => {
     if (!nome.trim()) {
       return Alert.alert("Erro", "O nome do pet é obrigatório.");
@@ -43,6 +53,9 @@ export default function EditarPetScreen({ route, navigation }) {
           placeholder="Digite o nome do pet"
           placeholderTextColor="#6D6D6D"
         />
+         {nomeMensagem() ? (
+                        <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text>
+                      ) : null}
 
         <Text style={Global.label}>Espécie</Text>
         <View style={Global.pickerContainer}>
