@@ -22,11 +22,42 @@ export default function RegisterScreen({ navigation }) {
   const { login } = useContext(AuthContext);
   const { fetchUser } = useContext(UserContext);
 
+   const nomeMensagem = () => {
+    if (nome.length > 0 && nome.length < 2) {
+      return "O nome deve ter pelo menos 2 caracteres.";
+    }
+    if (nome.length > 100) {
+      return "O nome não pode ter mais de 100 caracteres.";
+    }
+    return "";
+  };
+
+  const emailMensagem = () => {
+    if (email.length > 0 && email.length < 5) {
+      return "O email deve ter pelo menos 5 caracteres.";
+    }
+    if (email.length > 32) {
+      return "O email não pode ter mais de 32 caracteres.";
+    }
+    return "";
+  };
+
   const handleRegister = async () => {
     if (!nome || !email || !senha) {
       Alert.alert("Erro", "Preencha todos os campos.");
       return;
     }
+
+      if (nome.length < 2 || nome.length > 100) {
+    Alert.alert("Erro", "O nome deve ter entre 2 e 100 caracteres.");
+    return;
+  }
+
+  if (email.length < 5 || email.length > 32) {
+    Alert.alert("Erro", "O email deve ter entre 5 e 32 caracteres.");
+    return;
+  }
+
 
     try {
       setLoading(true);
@@ -74,6 +105,9 @@ export default function RegisterScreen({ navigation }) {
           value={nome}
           onChangeText={setNome}
         />
+  {nomeMensagem() ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text>
+      ) : null}
 
         <TextInput
           style={Global.input}
@@ -84,6 +118,9 @@ export default function RegisterScreen({ navigation }) {
           keyboardType="email-address"
           autoCapitalize="none"
         />
+         {emailMensagem() ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>{emailMensagem()}</Text>
+      ) : null}
 
         <View style={Global.inputSenhaContainer}>
           <TextInput
