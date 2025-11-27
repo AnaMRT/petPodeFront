@@ -53,7 +53,7 @@ export const UserProvider = ({ children }) => {
   try {
     const formData = new FormData();
     formData.append("file", {
-      uri: imageUri,
+      uri,
       name: "perfil.jpg",
       type: "image/jpeg",
     });
