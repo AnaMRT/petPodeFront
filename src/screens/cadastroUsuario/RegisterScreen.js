@@ -27,7 +27,7 @@ export default function RegisterScreen({ navigation }) {
       Alert.alert("Erro", "Preencha todos os campos.");
       return;
     }
-
+    
     try {
       setLoading(true);
 

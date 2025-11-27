@@ -4,7 +4,7 @@
     "slug": "petpode",
     "version": "1.0.7",
     "orientation": "portrait",
-    "icon": "./assets/PetPode-logo.png",
+    "icon": "./assets/icon-logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "petpode",
