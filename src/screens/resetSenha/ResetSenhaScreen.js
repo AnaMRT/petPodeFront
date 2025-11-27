@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import api from "../../../api.js";
 import { Button } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
@@ -51,7 +45,13 @@ export default function ResetSenhaScreen({ route, navigation }) {
       />
       <View style={Global.inputSenhaContainer}>
         <TextInput
-          style={{ flex: 1 }}
+          style={{
+            flex: 1,
+            paddingVertical: Platform.OS === "ios" ? 10 : 6,
+            fontFamily: "Nunito_400Regular",
+            fontSize: 15,
+            color: "#6D6D6D",
+          }}
           placeholder="NOVA SENHA"
           placeholderTextColor="#6D6D6D"
           secureTextEntry={!senhaVisivel}
