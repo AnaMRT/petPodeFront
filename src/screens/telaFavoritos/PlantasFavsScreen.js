@@ -23,7 +23,7 @@ export default function PlantasFavsScreen({ navigation }) {
   const [carregando, setCarregando] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [plantaSelecionada, setPlantaSelecionada] = useState(null);
-  const [mostrarBotaoTopo, setMostrarBotaoTopo] = useState(false);
+  const [showButton, setShowButton] = useState(false);
   const flatListRef = useRef(null);
   const { isAssinante } = useContext(PlanoContext);
 
@@ -143,10 +143,10 @@ export default function PlantasFavsScreen({ navigation }) {
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setMostrarBotaoTopo(offsetY > 250);
+    setShowButton(offsetY > 250);
   };
 
-  const rolarParaTopo = () =>
+  const scrollToTop = () =>
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
 
   return (
@@ -176,15 +176,11 @@ export default function PlantasFavsScreen({ navigation }) {
             scrollEventThrottle={16}
           />
 
-          {mostrarBotaoTopo && (
-            <TouchableOpacity
-              style={Global.botaoTopo}
-              onPress={rolarParaTopo}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="arrow-up" size={24} color="#fff" />
-            </TouchableOpacity>
-          )}
+          {showButton && (
+          <TouchableOpacity style={Global.scrollTopButton} onPress={scrollToTop}>
+            <Ionicons name="arrow-up" size={26} color="#fff" />
+          </TouchableOpacity>
+        )}
         </>
       )}
 
