@@ -47,18 +47,7 @@ export default function RegisterScreen({ navigation }) {
       Alert.alert("Erro", "Preencha todos os campos.");
       return;
     }
-
-      if (nome.length < 2 || nome.length > 100) {
-    Alert.alert("Erro", "O nome deve ter entre 2 e 100 caracteres.");
-    return;
-  }
-
-  if (email.length < 5 || email.length > 32) {
-    Alert.alert("Erro", "O email deve ter entre 5 e 32 caracteres.");
-    return;
-  }
-
-
+    
     try {
       setLoading(true);
 
