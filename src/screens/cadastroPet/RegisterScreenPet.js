@@ -42,7 +42,6 @@ export default function RegisterScreenPet({ navigation }) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      Alert.alert("Sucesso", "Pet cadastrado!");
       navigation.navigate("Home");
     } catch (error) {
       Alert.alert("Erro", "Não foi possível cadastrar.");

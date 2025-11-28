@@ -45,7 +45,7 @@ export default function EditarPetScreen({ route, navigation }) {
     <ScreenWrapper>
       <ScrollView contentContainerStyle={Global.containerEditar}>
 
-        <Text style={Global.label}>Nome</Text>
+        <Text style={Global.label}>NOME</Text>
         <TextInput
           value={nome}
           onChangeText={setNome}
@@ -57,7 +57,7 @@ export default function EditarPetScreen({ route, navigation }) {
                         <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text>
                       ) : null}
 
-        <Text style={Global.label}>Espécie</Text>
+        <Text style={Global.label}>ESPÉCIE</Text>
         <View style={Global.pickerContainer}>
           <Picker selectedValue={especie} onValueChange={setEspecie}>
             <Picker.Item label="Selecione a espécie" value="" />

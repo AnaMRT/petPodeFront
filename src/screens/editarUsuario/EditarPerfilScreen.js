@@ -12,7 +12,6 @@ import { UserContext } from "../../context/userContext/UserContext.js";
 import api from "../../../api";
 import EditarUsuarioStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
-import { color } from "react-native-elements/dist/helpers/index.js";
 
 export default function EditarPerfilScreen({ navigation }) {
   const { user, setUser } = useContext(UserContext);
@@ -69,8 +68,6 @@ export default function EditarPerfilScreen({ navigation }) {
 
       const mensagem =
         error.response?.data?.mensagem ||
-        error.response?.data?.message ||
-        error.response?.data?.error ||
         "Erro ao atualizar perfil";
 
       Alert.alert("Erro", mensagem);
@@ -123,7 +120,7 @@ export default function EditarPerfilScreen({ navigation }) {
   return (
     <ScreenWrapper>
       <ScrollView contentContainerStyle={Global.containerEditar}>
-        <Text style={Global.label}>Nome</Text>
+        <Text style={Global.label}>NOME</Text>
         <TextInput
           style={Global.inputEditar}
           placeholder="Seu nome"
@@ -132,7 +129,7 @@ export default function EditarPerfilScreen({ navigation }) {
         />
                 {nomeMensagem() ? <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text> : null}
 
-        <Text style={Global.label}>E-mail</Text>
+        <Text style={Global.label}>E-MAIL</Text>
         <TextInput
           style={Global.inputEditar}
           placeholder="seuemail@exemplo.com"
@@ -144,32 +141,32 @@ export default function EditarPerfilScreen({ navigation }) {
 
                 {emailMensagem() ? <Text style={{ color: "red", marginBottom: 10 }}>{emailMensagem()}</Text> : null}
 
-        <Text style={EditarUsuarioStyles.sectionTitle}>Alterar Senha (opcional)</Text>
+        <Text style={EditarUsuarioStyles.sectionTitle}>ALTERAR SENHA (OPCIONAL)</Text>
 
-        <Text style={Global.label}>Senha Atual</Text>
+        <Text style={Global.label}>SENHA ATUAL</Text>
         <TextInput
           style={Global.inputEditar}
-          placeholder="Digite sua senha atual"
+          placeholder="DIGITE SUA SENHA ATUAL"
           placeholderTextColor="#6D6D6D"
           secureTextEntry
           value={senhaAntiga}
           onChangeText={setSenhaAntiga}
         />
 
-        <Text style={Global.label}>Nova Senha</Text>
+        <Text style={Global.label}>NOVA SENHA</Text>
         <TextInput
           style={Global.inputEditar}
-          placeholder="Digite a nova senha"
+          placeholder="DIGITE A SENHA NOVA"
           placeholderTextColor="#6D6D6D"
           secureTextEntry
           value={novaSenha}
           onChangeText={setNovaSenha}
         />
 
-        <Text style={Global.label}>Confirmar Nova Senha</Text>
+        <Text style={Global.label}>CONFIRMAR NOVA SENHA</Text>
         <TextInput
           style={Global.inputEditar}
-          placeholder="Confirme a nova senha"
+          placeholder="CONFIRME A SENHA NOVA"
           placeholderTextColor="#6D6D6D"
           secureTextEntry
           value={confirmarSenha}
@@ -177,7 +174,7 @@ export default function EditarPerfilScreen({ navigation }) {
         />
 
         <Button
-          title={loading ? "Salvando..." : "Salvar Alterações"}
+          title={loading ? "SALVANDO..." : "SALVAR ALTERAÇÕES"}
           onPress={handleSave}
           disabled={loading}
           buttonStyle={Global.saveButton}
@@ -185,11 +182,11 @@ export default function EditarPerfilScreen({ navigation }) {
         />
 
         <Button
-          title={deleting ? "Excluindo..." : "Excluir Conta"}
+          title={deleting ? "EXCLUINDO..." : "EXCLUIR CONTA"}
           onPress={handleDeleteAccount}
           disabled={deleting}
-          buttonStyle={EditarUsuarioStyles.deleteButton}
-          titleStyle={EditarUsuarioStyles.deleteButtonText}
+          buttonStyle={[EditarUsuarioStyles.deleteButton, { backgroundColor: "#ffdddd" }]}
+          titleStyle={[EditarUsuarioStyles.deleteButtonText, { color: "#D9534F" }]}
         />
       </ScrollView>
     </ScreenWrapper>
