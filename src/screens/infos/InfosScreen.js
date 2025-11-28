@@ -17,19 +17,18 @@ function InfosScreen() {
   };
 
   return (
-    <View style={Global.container}>
+    <View style={[Global.container, { alignItems: "center" }]}>
       <Text style={Global.message}>
-        Como podemos ajudar?{"\n"}Contate nosso time: {"\n"}
-        {"\n"}
+        Como podemos ajudar?{"\n"}
+        Contate nosso time:{"\n\n"}
+      </Text>
 
-        <TouchableOpacity onPress={copyEmail} onLongPress={openEmailApp}>
-          <Text style={InfosStyles.email}>{email}</Text>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={copyEmail} onLongPress={openEmailApp}>
+        <Text style={InfosStyles.email}>{email}</Text>
+      </TouchableOpacity>
 
-        {"\n\n"}
-        <Text style={{ fontSize: 12, color: "#6D6D6D" }}>
-          Toque para copiar • Pressione e segure para enviar e-mail
-        </Text>
+      <Text style={{ fontSize: 12, color: "#6D6D6D", marginTop: 10 }}>
+        Toque para copiar • Pressione e segure para enviar e-mail
       </Text>
     </View>
   );

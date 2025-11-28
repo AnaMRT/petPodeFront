@@ -22,23 +22,23 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     fontSize: 15,
     paddingHorizontal: 10,
-    height: 48,       
+    height: 48,
     fontFamily: "Nunito_400Regular",
     color: "#6D6D6D",
     backgroundColor: "#fff",
   },
- inputSenhaContainer: {
-  flexDirection: "row",
-  alignItems: "center",
-  borderWidth: 1,
-  borderRadius: 20,
-  paddingHorizontal: 10,
-  paddingVertical: 6,   
-  height: 48,         
-  backgroundColor: "#fff",
-  color: "#6D6D6D",
-  marginBottom: 10,
-},
+  inputSenhaContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    height: 48,
+    backgroundColor: "#fff",
+    color: "#6D6D6D",
+    marginBottom: 10,
+  },
 
   //Tela Home talvez tela de plantcard tela favoritos
   cardVazio: {
@@ -176,15 +176,17 @@ const styles = StyleSheet.create({
   },
 
   inputEditar: {
-    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: "#A3B18A",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    height: 48,
+    backgroundColor: "#fff",
     color: "#6D6D6D",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 15,
-    fontSize: 15,
+    borderColor: "#A3B18A",
+    marginBottom: 10,
   },
   saveButton: {
     backgroundColor: "#6B4226",
@@ -240,7 +242,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   //tela PlatCard
-  
 });
 
 export default styles;
