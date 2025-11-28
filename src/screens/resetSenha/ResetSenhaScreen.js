@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, Platform } from "react-native";
 import api from "../../../api.js";
 import { Button } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,22 +20,30 @@ export default function ResetSenhaScreen({ route, navigation }) {
     }
 
     try {
-      await api.post("/auth/reset-password", {
-        codigo: codigo,
-        novaSenha: novaSenha,
+      const response = await api.post("/auth/reset-password", {
+        codigo,
+        novaSenha,
       });
+      const mensagemDoBack = response.data || "Senha redefinida com sucesso.";
 
-      Alert.alert("Sucesso", "Senha redefinida com sucesso.");
+      Alert.alert("Sucesso", mensagemDoBack);
       navigation.navigate("Login");
+
     } catch (error) {
       console.log(error.response?.data || error.message);
-      Alert.alert("Erro", "Código inválido ou expirado.");
+      const mensagemErro =
+        error.response?.data?.message || 
+        error.response?.data || 
+        "Código inválido ou expirado.";
+
+      Alert.alert("Erro", mensagemErro);
     }
   };
 
   return (
     <View style={Global.container}>
       <Text style={ResetSenhaStyles.title}>REDEFINIR SENHA</Text>
+
       <TextInput
         style={Global.input}
         placeholder="CÓDIGO"
@@ -43,6 +51,7 @@ export default function ResetSenhaScreen({ route, navigation }) {
         value={codigo}
         onChangeText={setCodigo}
       />
+
       <View style={Global.inputSenhaContainer}>
         <TextInput
           style={{
@@ -58,6 +67,7 @@ export default function ResetSenhaScreen({ route, navigation }) {
           value={novaSenha}
           onChangeText={setNovaSenha}
         />
+
         <TouchableOpacity onPress={() => setSenhaVisivel(!senhaVisivel)}>
           <Ionicons
             name={senhaVisivel ? "eye" : "eye-off"}
@@ -66,6 +76,7 @@ export default function ResetSenhaScreen({ route, navigation }) {
           />
         </TouchableOpacity>
       </View>
+
       <Button
         title="REDEFINIR SENHA"
         onPress={handleResetSenha}
