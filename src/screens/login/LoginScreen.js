@@ -24,7 +24,6 @@ export default function LoginScreen({ navigation }) {
 
       await AsyncStorage.setItem("userToken", token);
       await login(token);
-      Alert.alert("Login OK");
       navigation.navigate("Home");
       await login(token);
 
