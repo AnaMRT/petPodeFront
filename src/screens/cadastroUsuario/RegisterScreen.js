@@ -43,45 +43,52 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleRegister = async () => {
-    if (!nome || !email || !senha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
+  if (!nome || !email || !senha) {
+    Alert.alert("Erro", "Preencha todos os campos.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const cadastroResponse = await api.post("/auth/cadastro", {
+      nome,
+      email,
+      senha,
+    });
+
+    const { token } = cadastroResponse.data;
+
+    if (!token) {
+      throw new Error("Nenhum token retornado pelo servidor.");
     }
-    
-    try {
-      setLoading(true);
 
-      await api.post("/auth/cadastro", {
-        nome,
-        email,
-        senha,
-      });
+    await login(token);
 
-      const loginResponse = await api.post("/auth/login", {
-        email,
-        senha,
-      });
+    resetarPlano();
 
-      const { token } = loginResponse.data;
+    await fetchUser(token);
 
-      await login(token);
-      resetarPlano();
-      await fetchUser(token);
+    Alert.alert(
+      "Sucesso",
+      "Cadastro realizado com sucesso! Agora você pode adicionar sua foto no perfil."
+    );
 
-      Alert.alert(
-        "Sucesso",
-        "Cadastro realizado com sucesso! Agora você pode adicionar sua foto no perfil."
-      );
+    navigation.navigate("Cadastro de Pets");
 
-      navigation.navigate("Cadastro de Pets");
-    } catch (error) {
-      console.error(" Erro no cadastro:", error.response?.data || error);
-      Alert.alert("Erro", "Não foi possível cadastrar o usuário.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    console.log("Erro no cadastro:", error.response?.data);
 
+    const mensagemDoBack =
+      error.response?.data?.mensagem ||
+      error.response?.data ||
+      "Não foi possível cadastrar o usuário.";
+
+    Alert.alert("Erro", mensagemDoBack);
+  } finally {
+    setLoading(false);
+  }
+}; 
   return (
     <ScreenWrapper>
       <View style={Global.container}>

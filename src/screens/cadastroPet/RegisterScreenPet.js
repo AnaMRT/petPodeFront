@@ -23,31 +23,41 @@ export default function RegisterScreenPet({ navigation }) {
   };
 
   const handleRegisterPet = async () => {
-    if (!nome.trim() || !value) {
-      Alert.alert("Atenção", "Por favor, preencha o nome e selecione a espécie do pet.");
+  if (!nome.trim() || !value) {
+    Alert.alert("Atenção", "Por favor, preencha o nome e selecione a espécie do pet.");
+    return;
+  }
+
+  try {
+    const token = await AsyncStorage.getItem("userToken");
+    if (!token) {
+      Alert.alert("Erro", "Usuário não autenticado");
+      navigation.navigate("Login");
       return;
     }
 
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-      if (!token) {
-        Alert.alert("Erro", "Usuário não autenticado");
-        navigation.navigate("Login");
-        return;
-      }
+    await api.post(
+      "/pet",
+      { nome, especie: value },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      await api.post(
-        "/pet",
-        { nome, especie: value },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    navigation.navigate("Home");
 
-      navigation.navigate("Home");
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível cadastrar.");
-      console.log(error.response?.data || error.message);
-    }
-  };
+  } catch (error) {
+    console.log("Erro ao cadastrar pet:", error.response?.data || error.message);
+
+    const mensagem =
+      error.response?.data?.mensagem ||
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
+      "Não foi possível cadastrar o pet.";
+
+    Alert.alert("Erro", mensagem);
+  }
+};
+
 
   const handleSkip = () => navigation.navigate("Home");
 

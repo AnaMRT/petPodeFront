@@ -16,6 +16,7 @@ import PlantCard from "../../components/plantCard/PlantCard";
 import { Ionicons } from "@expo/vector-icons";
 import Global from "../../components/estilos/Styles";
 import { PlanoContext } from "../../context/planoContext/PlanoContext";
+import useApiError from "../../hooks/ApiError/useApiError.js";
 
 export default function PlantasFavsScreen({ navigation }) {
   const [favoritas, setFavoritas] = useState([]);
@@ -26,6 +27,7 @@ export default function PlantasFavsScreen({ navigation }) {
   const [showButton, setShowButton] = useState(false);
   const flatListRef = useRef(null);
   const { isAssinante } = useContext(PlanoContext);
+  const { getErrorMessage } = useApiError();
 
   const carregarFavoritas = async () => {
     try {
@@ -39,8 +41,9 @@ export default function PlantasFavsScreen({ navigation }) {
       setFavoritas(response.data);
       setFavoritosIds(response.data.map((p) => p.id));
     } catch (error) {
-      console.error("Erro ao carregar favoritas:", error);
-      Alert.alert("Erro", "Não foi possível carregar suas plantas favoritas.");
+      const mensagem = getErrorMessage(error);
+      console.error("Erro ao carregar favoritas:", mensagem);
+      Alert.alert("Erro", mensagem);
     } finally {
       setCarregando(false);
     }
@@ -67,7 +70,8 @@ export default function PlantasFavsScreen({ navigation }) {
 
           console.log("Favoritos removidos após cancelar o plano.");
         } catch (error) {
-          console.error("Erro ao limpar favoritas:", error);
+          const mensagem = getErrorMessage(error);
+          console.error("Erro ao limpar favoritas:", mensagem);
         }
       }
     };
@@ -75,41 +79,45 @@ export default function PlantasFavsScreen({ navigation }) {
     cancelarFavoritos();
   }, [isAssinante]);
 
-  const handleToggleFavorite = async (plantaId, isFavorito) => {
-    if (!isAssinante) {
-      Alert.alert(
-        "Recurso exclusivo",
-        "Este recurso é exclusivo para assinantes"
-      );
-      return;
+ const handleToggleFavorite = async (plantaId, isFavorito) => {
+  if (!isAssinante) {
+    Alert.alert(
+      "Recurso exclusivo",
+      "Este recurso é exclusivo para assinantes"
+    );
+    return;
+  }
+
+  try {
+    const token = await AsyncStorage.getItem("userToken");
+
+    if (isFavorito) {
+      await api.put(`/favoritos/${plantaId}`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFavoritosIds((prev) => [...prev, plantaId]);
+
+      const planta = favoritas.find((p) => p.id === plantaId);
+      if (planta) setFavoritas((prev) => [...prev, planta]);
+
+    } else {
+      await api.delete(`/favoritos/${plantaId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
+      setFavoritas((prev) => prev.filter((p) => p.id !== plantaId));
+      setTimeout(() => setModalVisible(false), 100);
     }
 
-    try {
-      const token = await AsyncStorage.getItem("userToken");
+  } catch (error) {
+    const mensagem = getErrorMessage(error);
+    console.error("Erro ao atualizar favorito:", mensagem);
+    Alert.alert("Erro", mensagem);
+  }
+};
 
-      if (isFavorito) {
-        await api.put(`/favoritos/${plantaId}`, null, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setFavoritosIds((prev) => [...prev, plantaId]);
-
-        const planta = favoritas.find((p) => p.id === plantaId);
-        if (planta) setFavoritas((prev) => [...prev, planta]);
-      } else {
-        await api.delete(`/favoritos/${plantaId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
-        setFavoritas((prev) => prev.filter((p) => p.id !== plantaId));
-        setTimeout(() => setModalVisible(false), 100);
-      }
-    } catch (error) {
-      console.error("Erro ao atualizar favorito:", error);
-      Alert.alert("Erro", "Não foi possível atualizar seus favoritos.");
-    }
-  };
 
   const renderItem = ({ item }) =>
     item.id === "vazio" ? (
@@ -177,10 +185,13 @@ export default function PlantasFavsScreen({ navigation }) {
           />
 
           {showButton && (
-          <TouchableOpacity style={Global.scrollTopButton} onPress={scrollToTop}>
-            <Ionicons name="arrow-up" size={26} color="#fff" />
-          </TouchableOpacity>
-        )}
+            <TouchableOpacity
+              style={Global.scrollTopButton}
+              onPress={scrollToTop}
+            >
+              <Ionicons name="arrow-up" size={26} color="#fff" />
+            </TouchableOpacity>
+          )}
         </>
       )}
 

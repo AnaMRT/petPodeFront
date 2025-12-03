@@ -13,6 +13,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { PlanoContext } from "../../context/planoContext/PlanoContext.js"; 
 import HomeStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
+import useApiError from "../../hooks/ApiError/useApiError.js";
 
 export default function HomeScreen({ navigation }) {
   const [plantas, setPlantas] = useState([]);
@@ -28,6 +29,7 @@ export default function HomeScreen({ navigation }) {
   const flatListRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
   const [showButton, setShowButton] = useState(false);
+  const { getErrorMessage } = useApiError();
 
   useEffect(() => {
     carregarPlantas();
@@ -41,72 +43,94 @@ export default function HomeScreen({ navigation }) {
   );
 
   const carregarPlantas = async () => {
-    try {
-      setCarregando(true);
-      const response = await api.get("/plantas");
-      setPlantas(response.data);
-    } catch (error) {
-      console.error("Erro ao carregar plantas:", error);
-    } finally {
-      setCarregando(false);
-    }
-  };
+  try {
+    setCarregando(true);
+    const response = await api.get("/plantas");
+    setPlantas(response.data);
+  } catch (error) {
+    const mensagem = getErrorMessage(error);
+    console.error("Erro ao carregar plantas:", mensagem);
+    Alert.alert("Erro", mensagem);
+  } finally {
+    setCarregando(false);
+  }
+};
+
 
   const carregarFavoritos = async () => {
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-      const response = await api.get("/favoritos", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFavoritosIds(response.data.map((p) => p.id));
-    } catch (error) {
-      console.error("Erro ao carregar favoritos:", error);
-    }
-  };
+  try {
+    const token = await AsyncStorage.getItem("userToken");
+    if (!token) return;
 
-  const buscarPlantas = async () => {
-    Keyboard.dismiss();
-    if (!busca.trim()) {
-      carregarPlantas();
-      return;
-    }
-    try {
-      setCarregando(true);
-      const token = await AsyncStorage.getItem("userToken");
-      const response = await api.get("/plantas/search", {
-        params: { termo: busca },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPlantas(response.data);
-    } catch (error) {
-      console.error("Erro na busca:", error);
-    } finally {
-      setCarregando(false);
-    }
-  };
+    const response = await api.get("/favoritos", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setFavoritosIds(response.data.map((p) => p.id));
+  } catch (error) {
+    const mensagem = getErrorMessage(error);
+    console.error("Erro ao carregar favoritos:", mensagem);
+  }
+};
+
+
+
+ const buscarPlantas = async () => {
+  Keyboard.dismiss();
+  if (!busca.trim()) {
+    carregarPlantas();
+    return;
+  }
+
+  try {
+    setCarregando(true);
+    const token = await AsyncStorage.getItem("userToken");
+
+    const response = await api.get("/plantas/search", {
+      params: { termo: busca },
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setPlantas(response.data);
+
+  } catch (error) {
+    const mensagem = getErrorMessage(error);
+    console.error("Erro na busca:", mensagem);
+    Alert.alert("Erro", mensagem);
+  } finally {
+    setCarregando(false);
+  }
+};
+
 
   const handleToggleFavorite = async (plantaId, isFavorito) => {
 
-    if (!isAssinante) {
-      Alert.alert("Recurso exclusivo", "Assine o plano para favoritar plantas ");
-      return;
+  if (!isAssinante) {
+    Alert.alert("Recurso exclusivo", "Assine o plano para favoritar plantas");
+    return;
+  }
+
+  try {
+    const token = await AsyncStorage.getItem("userToken");
+
+    if (isFavorito) {
+      await api.put(`/favoritos/${plantaId}`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFavoritosIds((prev) => [...prev, plantaId]);
+    } else {
+      await api.delete(`/favoritos/${plantaId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
     }
 
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-
-      if (isFavorito) {
-        await api.put(`/favoritos/${plantaId}`, null, { headers: { Authorization: `Bearer ${token}` } });
-        setFavoritosIds((prev) => [...prev, plantaId]);
-      } else {
-        await api.delete(`/favoritos/${plantaId}`, { headers: { Authorization: `Bearer ${token}` } });
-        setFavoritosIds((prev) => prev.filter((id) => id !== plantaId));
-      }
-
-    } catch (error) {
-      console.error("Erro ao atualizar favorito:", error);
-    }
-  };
+  } catch (error) {
+    const mensagem = getErrorMessage(error);
+    console.error("Erro ao atualizar favorito:", mensagem);
+    Alert.alert("Erro", mensagem);
+  }
+};
 
   const renderItem = ({ item }) => (
     <PlantCard
