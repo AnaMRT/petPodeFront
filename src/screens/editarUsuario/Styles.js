@@ -1,8 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const Styles = StyleSheet.create({
-
-    sectionTitle: {
+  sectionTitle: {
     marginTop: 25,
     marginBottom: 10,
     fontSize: 18,
@@ -14,10 +13,21 @@ const Styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 14,
     marginTop: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   deleteButtonText: {
     color: "#fff",
-    fontWeight: "700",
+    fontFamily: "Nunito_700Bold",
+    fontSize: 14,
+  },
+  deleteButtonLoading: {
+    backgroundColor: "#ffdddd",
+  },
+  deleteButtonLoadingText: {
+    color: "#D9534F",
+    fontFamily: "Nunito_700Bold",
+    fontSize: 14,
   },
 });
 export default Styles;

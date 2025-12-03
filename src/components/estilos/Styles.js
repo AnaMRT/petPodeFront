@@ -193,10 +193,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 14,
     marginTop: 10,
+    alignItems: "center",
+    justifyContent:"center"
   },
   saveButtonText: {
     color: "#fff",
-    fontWeight: "700",
+    fontFamily: "Nunito_700Bold",
+    fontSize: 14,
   },
 
   //tela de editar pet
@@ -241,7 +244,19 @@ const styles = StyleSheet.create({
     color: "#6B4226",
     fontSize: 16,
   },
-  //tela PlatCard
+  
+
+
+  ButtonLoading: {
+    backgroundColor: "#F4EDE4",
+    borderColor: "#F4EDE4",
+  },
+
+  ButtonLoadingText: {
+    color: "#6B4226",
+    fontFamily: "Nunito_700Bold",
+    fontSize: 14,
+  },
 });
 
 export default styles;
