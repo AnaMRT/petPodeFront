@@ -22,7 +22,7 @@ export default function RegisterScreen({ navigation }) {
   const { login } = useContext(AuthContext);
   const { fetchUser } = useContext(UserContext);
 
-   const nomeMensagem = () => {
+  const nomeMensagem = () => {
     if (nome.length > 0 && nome.length < 2) {
       return "O nome deve ter pelo menos 2 caracteres.";
     }
@@ -43,52 +43,51 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleRegister = async () => {
-  if (!nome || !email || !senha) {
-    Alert.alert("Erro", "Preencha todos os campos.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const cadastroResponse = await api.post("/auth/cadastro", {
-      nome,
-      email,
-      senha,
-    });
-
-    const { token } = cadastroResponse.data;
-
-    if (!token) {
-      throw new Error("Nenhum token retornado pelo servidor.");
+    if (!nome || !email || !senha) {
+      Alert.alert("Erro", "Preencha todos os campos.");
+      return;
     }
 
-    await login(token);
+    try {
+      setLoading(true);
 
-    resetarPlano();
+      const cadastroResponse = await api.post("/auth/cadastro", {
+        nome,
+        email,
+        senha,
+      });
 
-    await fetchUser(token);
+      const { token } = cadastroResponse.data;
 
-    Alert.alert(
-      "Sucesso",
-      "Cadastro realizado com sucesso! Agora você pode adicionar sua foto no perfil."
-    );
+      if (!token) {
+        throw new Error("Nenhum token retornado pelo servidor.");
+      }
 
-    navigation.navigate("Cadastro de Pets");
+      await login(token);
 
-  } catch (error) {
-    console.log("Erro no cadastro:", error.response?.data);
+      resetarPlano();
 
-    const mensagemDoBack =
-      error.response?.data?.mensagem ||
-      error.response?.data ||
-      "Não foi possível cadastrar o usuário.";
+      await fetchUser(token);
 
-    Alert.alert("Erro", mensagemDoBack);
-  } finally {
-    setLoading(false);
-  }
-}; 
+      Alert.alert(
+        "Sucesso",
+        "Cadastro realizado com sucesso! Agora você pode adicionar sua foto no perfil."
+      );
+
+      navigation.navigate("Cadastro de Pets");
+    } catch (error) {
+      console.log("Erro no cadastro:", error.response?.data);
+
+      const mensagemDoBack =
+        error.response?.data?.mensagem ||
+        error.response?.data ||
+        "Não foi possível cadastrar o usuário.";
+
+      Alert.alert("Erro", mensagemDoBack);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <ScreenWrapper>
       <View style={Global.container}>
@@ -101,9 +100,11 @@ export default function RegisterScreen({ navigation }) {
           value={nome}
           onChangeText={setNome}
         />
-  {nomeMensagem() ? (
-        <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text>
-      ) : null}
+        {nomeMensagem() ? (
+          <Text style={{ color: "red", marginBottom: 10 }}>
+            {nomeMensagem()}
+          </Text>
+        ) : null}
 
         <TextInput
           style={Global.input}
@@ -114,17 +115,19 @@ export default function RegisterScreen({ navigation }) {
           keyboardType="email-address"
           autoCapitalize="none"
         />
-         {emailMensagem() ? (
-        <Text style={{ color: "red", marginBottom: 10 }}>{emailMensagem()}</Text>
-      ) : null}
+        {emailMensagem() ? (
+          <Text style={{ color: "red", marginBottom: 10 }}>
+            {emailMensagem()}
+          </Text>
+        ) : null}
 
         <View style={Global.inputSenhaContainer}>
           <TextInput
             style={{
               flex: 1,
               paddingVertical: Platform.OS === "ios" ? 10 : 6,
-              fontFamily: "Nunito_400Regular", 
-              fontSize: 15, 
+              fontFamily: "Nunito_400Regular",
+              fontSize: 15,
               color: "#6D6D6D",
             }}
             placeholder="SENHA"
@@ -142,13 +145,24 @@ export default function RegisterScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <Button
-          title={loading ? "Cadastrando..." : "CADASTRAR"}
+        <TouchableOpacity
+          style={[
+            CadastroUsuarioStyles.submitButton,
+            loading && Global.ButtonLoading,
+          ]}
           onPress={handleRegister}
           disabled={loading}
-          buttonStyle={CadastroUsuarioStyles.submitButton}
-          titleStyle={Global.buttonText}
-        />
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[
+              Global.buttonText,
+              loading && CadastroUsuarioStyles.ButtonLoadingText,
+            ]}
+          >
+            {loading ? "CADASTRANDO..." : "CADASTRAR"}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={{ marginTop: 20 }}

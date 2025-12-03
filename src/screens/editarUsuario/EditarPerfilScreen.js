@@ -1,5 +1,11 @@
 import React, { useState, useContext } from "react";
-import { Text, TextInput, Alert, ScrollView } from "react-native";
+import {
+  Text,
+  TextInput,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
@@ -185,27 +191,40 @@ export default function EditarPerfilScreen({ navigation }) {
           onChangeText={setConfirmarSenha}
         />
 
-        <Button
-          title={loading ? "SALVANDO..." : "SALVAR ALTERAÇÕES"}
+        <TouchableOpacity
+          style={[Global.saveButton, loading && Global.ButtonLoading]}
           onPress={handleSave}
           disabled={loading}
-          buttonStyle={Global.saveButton}
-          titleStyle={Global.saveButtonText}
-        />
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[
+              Global.saveButtonText,
+              loading && Global.ButtonLoadingText,
+            ]}
+          >
+            {loading ? "SALVANDO..." : "SALVAR ALTERAÇÕES"}
+          </Text>
+        </TouchableOpacity>
 
-        <Button
-          title={deleting ? "EXCLUINDO..." : "EXCLUIR CONTA"}
+        <TouchableOpacity
+          style={[
+            EditarUsuarioStyles.deleteButton,
+            deleting && EditarUsuarioStyles.deleteButtonLoading,
+          ]}
           onPress={handleDeleteAccount}
           disabled={deleting}
-          buttonStyle={[
-            EditarUsuarioStyles.deleteButton,
-            { backgroundColor: "#ffdddd" },
-          ]}
-          titleStyle={[
-            EditarUsuarioStyles.deleteButtonText,
-            { color: "#D9534F" },
-          ]}
-        />
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[
+              EditarUsuarioStyles.deleteButtonText,
+              deleting && EditarUsuarioStyles.deleteButtonLoadingText,
+            ]}
+          >
+            {deleting ? "EXCLUINDO..." : "EXCLUIR CONTA"}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </ScreenWrapper>
   );

@@ -14,5 +14,10 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     fontFamily: "Nunito_400Regular",
   },
+    ButtonLoadingText: {
+    color: "#6B4226",
+    fontFamily: "Nunito_500Medium",
+    fontSize: 18,
+  },
 });
 export default styles;
