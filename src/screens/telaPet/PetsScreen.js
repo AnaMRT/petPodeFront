@@ -16,13 +16,10 @@ import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
 import api from "../../../api";
 import { PetsContext } from "../../context/petsContext/PetsContext.js";
 import PhotoPickerModalPet from "../../components/photoPickerPet/PhotoPickerModalPet.js";
-import {
-  MaterialCommunityIcons,
-  Feather,
-  Ionicons,
-} from "@expo/vector-icons";
+import { MaterialCommunityIcons, Feather, Ionicons } from "@expo/vector-icons";
 import PetStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
+import useApiError from "../../hooks/ApiError/useApiError.js";
 
 const { width } = Dimensions.get("window");
 const CARD_SIZE = (width - 60) / 2;
@@ -35,6 +32,7 @@ export default function PetsScreen({ navigation }) {
   const [petSelecionado, setPetSelecionado] = useState(null);
   const [showButton, setShowButton] = useState(false);
   const flatListRef = useRef(null);
+  const { getErrorMessage } = useApiError();
 
   const fetchPets = async () => {
     try {
@@ -45,8 +43,9 @@ export default function PetsScreen({ navigation }) {
       });
       setPets(response.data);
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível carregar seus pets.");
-      console.log(error);
+      const mensagem = getErrorMessage(error);
+      console.log("[ERRO AO LISTAR PETS]", mensagem, error);
+      Alert.alert("Erro", mensagem);
     } finally {
       setLoading(false);
     }
@@ -122,8 +121,9 @@ export default function PetsScreen({ navigation }) {
 
       Alert.alert("Sucesso", "Imagem atualizada!");
     } catch (error) {
-      console.log("[ERRO AO ATUALIZAR IMAGEM]", error.response?.data || error);
-      Alert.alert("Erro", "Não foi possível atualizar a foto.");
+      const mensagem = getErrorMessage(error);
+      console.log("[ERRO AO ATUALIZAR IMAGEM]", mensagem, error);
+      Alert.alert("Erro", mensagem);
     } finally {
       setUploading(false);
     }
@@ -137,12 +137,15 @@ export default function PetsScreen({ navigation }) {
       });
       setPets((prevPets) => prevPets.filter((p) => p.id !== petId));
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível excluir o pet.");
+      const mensagem = getErrorMessage(error);
+      console.log("[ERRO AO EXCLUIR PET]", mensagem, error);
+      Alert.alert("Erro", mensagem);
     }
   };
 
   const abrirCadastroPet = () => navigation.navigate("Cadastro de Pets");
-  const abrirEditarPet = (pet) =>navigation.navigate("EditarPetScreen", { pet });
+  const abrirEditarPet = (pet) =>
+    navigation.navigate("EditarPetScreen", { pet });
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -249,7 +252,10 @@ export default function PetsScreen({ navigation }) {
               }
               onScroll={handleScroll}
               scrollEventThrottle={16}
-              contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 5 }}
+              contentContainerStyle={{
+                paddingBottom: 20,
+                paddingHorizontal: 5,
+              }}
             />
 
             <PhotoPickerModalPet

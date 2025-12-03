@@ -13,32 +13,33 @@ export default function ResetSenhaScreen({ route, navigation }) {
   const [novaSenha, setNovaSenha] = useState("");
   const [senhaVisivel, setSenhaVisivel] = useState(false);
 
-  const handleResetSenha = async () => {
-    if (!codigo || !novaSenha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
-    }
+ const handleResetSenha = async () => {
+  if (!codigo || !novaSenha) {
+    Alert.alert("Erro", "Preencha todos os campos.");
+    return;
+  }
 
-    try {
-      const response = await api.post("/auth/reset-password", {
-        codigo,
-        novaSenha,
-      });
-      const mensagemDoBack = response.data || "Senha redefinida com sucesso.";
+  try {
+    const response = await api.post("/auth/reset-password", {
+      email,
+      codigo,
+      novaSenha,
+    });
 
-      Alert.alert("Sucesso", mensagemDoBack);
-      navigation.navigate("Login");
+    const mensagemDoBack = response.data?.mensagem || "Senha redefinida com sucesso.";
+    Alert.alert("Sucesso", mensagemDoBack);
+    navigation.navigate("Login");
 
-    } catch (error) {
-      console.log(error.response?.data || error.message);
-      const mensagemErro =
-        error.response?.data?.message || 
-        error.response?.data || 
-        "Código inválido ou expirado.";
+  } catch (error) {
+    console.log(error.response?.data || error.message);
+    const mensagemErro =
+      error.response?.data?.mensagem ||
+      error.response?.data?.message ||
+      "Código inválido ou expirado.";
 
-      Alert.alert("Erro", mensagemErro);
-    }
-  };
+    Alert.alert("Erro", mensagemErro);
+  }
+};
 
   return (
     <View style={Global.container}>
@@ -50,6 +51,7 @@ export default function ResetSenhaScreen({ route, navigation }) {
         placeholderTextColor="#6D6D6D"
         value={codigo}
         onChangeText={setCodigo}
+        keyboardType="numeric"
       />
 
       <View style={Global.inputSenhaContainer}>

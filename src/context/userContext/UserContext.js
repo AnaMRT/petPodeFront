@@ -2,13 +2,15 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../authContext/AuthContext";
 import api from "../../../api";
+import useApiError from "../../hooks/ApiError/useApiError.js";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);      
+  const [user, setUser] = useState(null);
   const [userPhoto, setUserPhoto] = useState(null);
   const { user: authUser, loading } = useContext(AuthContext);
+  const { getErrorMessage } = useApiError();
 
   const fetchUser = async (token) => {
     if (!token) return;
@@ -27,13 +29,15 @@ export const UserProvider = ({ children }) => {
 
       await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
     } catch (error) {
-      console.log(
-        " Erro ao carregar usuário:",
-        error.response?.data || error
-      );
+     const mensagem = getErrorMessage(error);
+
+      console.log("Erro ao carregar usuário:", mensagem);
+
       setUser(null);
       setUserPhoto(null);
       await AsyncStorage.removeItem("userInfo");
+
+      return { sucesso: false, mensagem };
     }
   };
 
@@ -48,34 +52,35 @@ export const UserProvider = ({ children }) => {
   }, [authUser?.token, loading]);
 
   const setUserPhotoUpload = async (uri) => {
-  if (!authUser?.token) return false;
+    if (!authUser?.token) return false;
 
-  try {
-    const formData = new FormData();
-    formData.append("file", {
-      uri,
-      name: "perfil.jpg",
-      type: "image/jpeg",
-    });
+    try {
+      const formData = new FormData();
+      formData.append("file", {
+        uri,
+        name: "perfil.jpg",
+        type: "image/jpeg",
+      });
 
-    await api.put("/usuario/imagem", formData, {
-      headers: {
-        Authorization: `Bearer ${authUser.token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+      await api.put("/usuario/imagem", formData, {
+        headers: {
+          Authorization: `Bearer ${authUser.token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    console.log("Foto enviada com sucesso. Recarregando usuário...");
-    await fetchUser(authUser.token);
+      console.log("Foto enviada com sucesso. Recarregando usuário...");
+      await fetchUser(authUser.token);
 
-    return true;
+      return true;
+    } catch (error) {
+      const mensagem = getErrorMessage(error);
 
-  } catch (error) {
-    console.error("Erro ao enviar imagem:", error.response?.data || error);
-    return false;
-  }
-};
+      console.error("Erro ao enviar imagem:", mensagem);
 
+      return { sucesso: false, mensagem };
+    }
+  };
 
   return (
     <UserContext.Provider
@@ -84,7 +89,7 @@ export const UserProvider = ({ children }) => {
         setUser,
         userPhoto,
         setUserPhoto: setUserPhotoUpload,
-        fetchUser, 
+        fetchUser,
       }}
     >
       {children}

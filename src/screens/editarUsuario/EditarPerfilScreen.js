@@ -1,10 +1,5 @@
 import React, { useState, useContext } from "react";
-import {
-  Text,
-  TextInput,
-  Alert,
-  ScrollView,
-} from "react-native";
+import { Text, TextInput, Alert, ScrollView } from "react-native";
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
@@ -12,6 +7,7 @@ import { UserContext } from "../../context/userContext/UserContext.js";
 import api from "../../../api";
 import EditarUsuarioStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
+import useApiError from "../../hooks/ApiError/useApiError.js";
 
 export default function EditarPerfilScreen({ navigation }) {
   const { user, setUser } = useContext(UserContext);
@@ -23,19 +19,21 @@ export default function EditarPerfilScreen({ navigation }) {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { getErrorMessage } = useApiError();
 
-    const nomeMensagem = () => {
-    if (nome.length > 0 && nome.length < 2) return "O nome deve ter pelo menos 2 caracteres.";
+  const nomeMensagem = () => {
+    if (nome.length > 0 && nome.length < 2)
+      return "O nome deve ter pelo menos 2 caracteres.";
     if (nome.length > 100) return "O nome não pode ter mais de 100 caracteres.";
     return "";
   };
 
   const emailMensagem = () => {
-    if (email.length > 0 && email.length < 5) return "O email deve ter pelo menos 5 caracteres.";
+    if (email.length > 0 && email.length < 5)
+      return "O email deve ter pelo menos 5 caracteres.";
     if (email.length > 32) return "O email não pode ter mais de 32 caracteres.";
     return "";
   };
-
 
   const handleSave = async () => {
     setLoading(true);
@@ -66,9 +64,7 @@ export default function EditarPerfilScreen({ navigation }) {
     } catch (error) {
       console.log("ERRO AO ATUALIZAR PERFIL:", error.response?.data);
 
-      const mensagem =
-        error.response?.data?.mensagem ||
-        "Erro ao atualizar perfil";
+      const mensagem = getErrorMessage(error);
 
       Alert.alert("Erro", mensagem);
     } finally {
@@ -100,14 +96,20 @@ export default function EditarPerfilScreen({ navigation }) {
               await AsyncStorage.clear();
               setUser(null);
 
-              Alert.alert("Conta excluída", "Sua conta foi removida com sucesso!");
+              Alert.alert(
+                "Conta excluída",
+                "Sua conta foi removida com sucesso!"
+              );
               navigation.reset({
                 index: 0,
                 routes: [{ name: "Login" }],
               });
             } catch (error) {
               console.log("ERRO AO EXCLUIR CONTA:", error.response?.data);
-              Alert.alert("Erro", "Não foi possível excluir a conta.");
+
+              const mensagem = getErrorMessage(error);
+
+              Alert.alert("Erro", mensagem);
             } finally {
               setDeleting(false);
             }
@@ -127,7 +129,11 @@ export default function EditarPerfilScreen({ navigation }) {
           value={nome}
           onChangeText={setNome}
         />
-                {nomeMensagem() ? <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text> : null}
+        {nomeMensagem() ? (
+          <Text style={{ color: "red", marginBottom: 10 }}>
+            {nomeMensagem()}
+          </Text>
+        ) : null}
 
         <Text style={Global.label}>E-MAIL</Text>
         <TextInput
@@ -139,9 +145,15 @@ export default function EditarPerfilScreen({ navigation }) {
           autoCapitalize="none"
         />
 
-                {emailMensagem() ? <Text style={{ color: "red", marginBottom: 10 }}>{emailMensagem()}</Text> : null}
+        {emailMensagem() ? (
+          <Text style={{ color: "red", marginBottom: 10 }}>
+            {emailMensagem()}
+          </Text>
+        ) : null}
 
-        <Text style={EditarUsuarioStyles.sectionTitle}>ALTERAR SENHA (OPCIONAL)</Text>
+        <Text style={EditarUsuarioStyles.sectionTitle}>
+          ALTERAR SENHA (OPCIONAL)
+        </Text>
 
         <Text style={Global.label}>SENHA ATUAL</Text>
         <TextInput
@@ -185,11 +197,16 @@ export default function EditarPerfilScreen({ navigation }) {
           title={deleting ? "EXCLUINDO..." : "EXCLUIR CONTA"}
           onPress={handleDeleteAccount}
           disabled={deleting}
-          buttonStyle={[EditarUsuarioStyles.deleteButton, { backgroundColor: "#ffdddd" }]}
-          titleStyle={[EditarUsuarioStyles.deleteButtonText, { color: "#D9534F" }]}
+          buttonStyle={[
+            EditarUsuarioStyles.deleteButton,
+            { backgroundColor: "#ffdddd" },
+          ]}
+          titleStyle={[
+            EditarUsuarioStyles.deleteButtonText,
+            { color: "#D9534F" },
+          ]}
         />
       </ScrollView>
     </ScreenWrapper>
   );
 }
-

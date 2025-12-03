@@ -18,49 +18,56 @@ export default function LoginScreen({ navigation }) {
   const { login } = useContext(AuthContext);
 
   const handleLogin = async () => {
-    try {
-      const response = await api.post("/auth/login", { email, senha });
-      const token = response.data.token;
+  try {
+    const response = await api.post("/auth/login", { email, senha });
+    const token = response.data.token;
 
-      await AsyncStorage.setItem("userToken", token);
-      await login(token);
-      navigation.navigate("Home");
-      await login(token);
+    await AsyncStorage.setItem("userToken", token);
+    await login(token);
 
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Home" }],
-      });
-    } catch (error) {
-      Alert.alert("Erro", "Email ou senha incorretos.");
-    }
-  };
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Home" }],
+    });
+
+  } catch (error) {
+    const mensagemDoBack =
+      error.response?.data?.mensagem ||
+      error.response?.data ||
+      "Erro inesperado.";
+
+    Alert.alert("Erro", mensagemDoBack);
+  }
+};
+
 
   const handleForgotPassword = async () => {
-    if (!email) {
-      Alert.alert("Erro", "Digite seu e-mail primeiro.");
-      return;
-    }
+  if (!email) {
+    Alert.alert("Erro", "Digite seu e-mail primeiro.");
+    return;
+  }
 
-    try {
-      await api.post(`/auth/forgot-password?email=${email}`);
+  try {
+    await api.post(`/auth/forgot-password?email=${email}`);
 
-      Alert.alert(
-        "Verifique seu e-mail",
-        "Enviamos um código para redefinição de senha."
-      );
-      navigation.navigate("ResetSenha", { email });
-    } catch (error) {
-      console.log(
-        "Erro Android:",
-        error?.response?.data || error.message || error
-      );
-      Alert.alert(
-        "Erro",
-        "Não foi possível conectar ao servidor ou enviar o e-mail."
-      );
-    }
-  };
+    Alert.alert("Verifique seu e-mail",
+      "Enviamos um código para redefinição de senha."
+    );
+
+    navigation.navigate("ResetSenha", { email });
+
+  } catch (error) {
+    console.log("Erro Android:", error?.response?.data);
+
+    const mensagemDoBack =
+      error.response?.data?.mensagem ||
+      error.response?.data ||
+      "Erro inesperado.";
+
+    Alert.alert("Erro", mensagemDoBack);
+  }
+};
+
 
   return (
     <ScreenWrapper>
