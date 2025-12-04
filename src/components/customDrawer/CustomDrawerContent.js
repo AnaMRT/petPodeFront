@@ -73,14 +73,12 @@ export default function CustomDrawerContent() {
   const destDir = FileSystem.Paths.document;
   console.log('destDir', destDir);
 
-  // Arquivos (objeto File, não string)
   const sourceFile = File.fromUri(uri);
   console.log('sourceFile', sourceFile);
 
   const destFile = new File(destDir, fileName);
   console.log('destFile', destFile);
 
-  // Copiar para armazenamento seguro
   await sourceFile.copyToAsync(destFile);
   
 
