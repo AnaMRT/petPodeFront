@@ -84,7 +84,6 @@ export default function RegisterScreenPet({ navigation }) {
             style={Global.picker}
             prompt="Selecione a espécie"
           >
-            <Picker.Item label="Selecione a espécie" value={null} />
             <Picker.Item label="Canino" value="canino" />
             <Picker.Item label="Felino" value="felino" />
           </Picker>
