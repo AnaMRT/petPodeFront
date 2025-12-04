@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, Platform } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Platform,
+} from "react-native";
 import api from "../../../api.js";
 import { Button } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,33 +20,33 @@ export default function ResetSenhaScreen({ route, navigation }) {
   const [novaSenha, setNovaSenha] = useState("");
   const [senhaVisivel, setSenhaVisivel] = useState(false);
 
- const handleResetSenha = async () => {
-  if (!codigo || !novaSenha) {
-    Alert.alert("Erro", "Preencha todos os campos.");
-    return;
-  }
+  const handleResetSenha = async () => {
+    if (!codigo || !novaSenha) {
+      Alert.alert("Erro", "Preencha todos os campos.");
+      return;
+    }
 
-  try {
-    const response = await api.post("/auth/reset-password", {
-      email,
-      codigo,
-      novaSenha,
-    });
+    try {
+      const response = await api.post("/auth/reset-password", {
+        email,
+        codigo,
+        novaSenha,
+      });
 
-    const mensagemDoBack = response.data?.mensagem || "Senha redefinida com sucesso.";
-    Alert.alert("Sucesso", mensagemDoBack);
-    navigation.navigate("Login");
+      const mensagemDoBack =
+        response.data?.mensagem || "Senha redefinida com sucesso.";
+      Alert.alert("Sucesso", mensagemDoBack);
+      navigation.navigate("Login");
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      const mensagemErro =
+        error.response?.data?.mensagem ||
+        error.response?.data?.message ||
+        "Código inválido ou expirado.";
 
-  } catch (error) {
-    console.log(error.response?.data || error.message);
-    const mensagemErro =
-      error.response?.data?.mensagem ||
-      error.response?.data?.message ||
-      "Código inválido ou expirado.";
-
-    Alert.alert("Erro", mensagemErro);
-  }
-};
+      Alert.alert("Erro", mensagemErro);
+    }
+  };
 
   return (
     <View style={Global.container}>

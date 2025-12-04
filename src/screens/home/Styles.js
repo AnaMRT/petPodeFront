@@ -6,14 +6,17 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: "#F9F3F6",
   },
+
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 30,
   },
+
   iconUserContainer: {
     paddingRight: 10,
   },
+
   userPhoto: {
     width: 40,
     height: 40,
@@ -21,6 +24,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#6B4226",
   },
+
   searchBox: {
     flex: 1,
     flexDirection: "row",
@@ -31,15 +35,18 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 10,
   },
+
   searchInput: {
     flex: 1,
     height: 40,
     color: "#6D6D6D",
     fontFamily: "Nunito_400Regular",
   },
+
   searchIcon: {
     paddingLeft: 10,
   },
+
   alerta: {
     color: "#D9534F",
     fontSize: 14,
@@ -47,6 +54,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontFamily: "Nunito_700Bold",
   },
+
   linha: {
     justifyContent: "space-between",
     marginBottom: 10,

@@ -29,7 +29,7 @@ export const UserProvider = ({ children }) => {
 
       await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
     } catch (error) {
-     const mensagem = getErrorMessage(error);
+      const mensagem = getErrorMessage(error);
 
       console.log("Erro ao carregar usuário:", mensagem);
 

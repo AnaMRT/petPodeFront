@@ -153,7 +153,7 @@ export default function App() {
     Nunito_700Bold,
   });
 
-  if (!fontsLoaded) return null; 
+  if (!fontsLoaded) return null;
   return (
     <AuthProvider>
       <UserProvider>
@@ -195,7 +195,7 @@ export default function App() {
                   options={{
                     headerShown: true,
                     title: "EDITAR PERFIL",
-                    headerBackTitle: "",           
+                    headerBackTitle: "",
                     headerBackTitleVisible: false,
                     headerTintColor: "#2C2C2C",
                     headerStyle: { backgroundColor: "#F9F3F6" },
@@ -213,6 +213,7 @@ export default function App() {
                   options={{
                     headerShown: true,
                     title: "",
+                    headerBackTitle: "",
                     headerBackTitleVisible: false,
                     headerTintColor: "#2C2C2C",
                     headerStyle: { backgroundColor: "#F9F3F6" },

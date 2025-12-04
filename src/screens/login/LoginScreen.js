@@ -1,5 +1,4 @@
 import React, { useState, useContext } from "react";
-import { useFonts } from "expo-font";
 import { Button } from "react-native-elements";
 import { View, TextInput, Text, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,56 +17,53 @@ export default function LoginScreen({ navigation }) {
   const { login } = useContext(AuthContext);
 
   const handleLogin = async () => {
-  try {
-    const response = await api.post("/auth/login", { email, senha });
-    const token = response.data.token;
+    try {
+      const response = await api.post("/auth/login", { email, senha });
+      const token = response.data.token;
 
-    await AsyncStorage.setItem("userToken", token);
-    await login(token);
+      await AsyncStorage.setItem("userToken", token);
+      await login(token);
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Home" }],
-    });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
+    } catch (error) {
+      const mensagemDoBack =
+        error.response?.data?.mensagem ||
+        error.response?.data ||
+        "Erro inesperado.";
 
-  } catch (error) {
-    const mensagemDoBack =
-      error.response?.data?.mensagem ||
-      error.response?.data ||
-      "Erro inesperado.";
-
-    Alert.alert("Erro", mensagemDoBack);
-  }
-};
-
+      Alert.alert("Erro", mensagemDoBack);
+    }
+  };
 
   const handleForgotPassword = async () => {
-  if (!email) {
-    Alert.alert("Erro", "Digite seu e-mail primeiro.");
-    return;
-  }
+    if (!email) {
+      Alert.alert("Erro", "Digite seu e-mail primeiro.");
+      return;
+    }
 
-  try {
-    await api.post(`/auth/forgot-password?email=${email}`);
+    try {
+      await api.post(`/auth/forgot-password?email=${email}`);
 
-    Alert.alert("Verifique seu e-mail",
-      "Enviamos um código para redefinição de senha."
-    );
+      Alert.alert(
+        "Verifique seu e-mail",
+        "Enviamos um código para redefinição de senha."
+      );
 
-    navigation.navigate("ResetSenha", { email });
+      navigation.navigate("ResetSenha", { email });
+    } catch (error) {
+      console.log("Erro Android:", error?.response?.data);
 
-  } catch (error) {
-    console.log("Erro Android:", error?.response?.data);
+      const mensagemDoBack =
+        error.response?.data?.mensagem ||
+        error.response?.data ||
+        "Erro inesperado.";
 
-    const mensagemDoBack =
-      error.response?.data?.mensagem ||
-      error.response?.data ||
-      "Erro inesperado.";
-
-    Alert.alert("Erro", mensagemDoBack);
-  }
-};
-
+      Alert.alert("Erro", mensagemDoBack);
+    }
+  };
 
   return (
     <ScreenWrapper>
@@ -89,8 +85,8 @@ export default function LoginScreen({ navigation }) {
             style={{
               flex: 1,
               paddingVertical: Platform.OS === "ios" ? 10 : 6,
-              fontFamily: "Nunito_400Regular", 
-              fontSize: 15, 
+              fontFamily: "Nunito_400Regular",
+              fontSize: 15,
               color: "#6D6D6D",
             }}
             placeholder="SENHA"

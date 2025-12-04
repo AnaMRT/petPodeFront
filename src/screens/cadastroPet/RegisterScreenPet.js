@@ -12,7 +12,7 @@ export default function RegisterScreenPet({ navigation }) {
   const [nome, setNome] = useState("");
   const [value, setValue] = useState(null);
 
-   const nomeMensagem = () => {
+  const nomeMensagem = () => {
     if (nome.length > 0 && nome.length < 2) {
       return "O nome deve ter pelo menos 2 caracteres.";
     }
@@ -23,41 +23,45 @@ export default function RegisterScreenPet({ navigation }) {
   };
 
   const handleRegisterPet = async () => {
-  if (!nome.trim() || !value) {
-    Alert.alert("Atenção", "Por favor, preencha o nome e selecione a espécie do pet.");
-    return;
-  }
-
-  try {
-    const token = await AsyncStorage.getItem("userToken");
-    if (!token) {
-      Alert.alert("Erro", "Usuário não autenticado");
-      navigation.navigate("Login");
+    if (!nome.trim() || !value) {
+      Alert.alert(
+        "Atenção",
+        "Por favor, preencha o nome e selecione a espécie do pet."
+      );
       return;
     }
 
-    await api.post(
-      "/pet",
-      { nome, especie: value },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      if (!token) {
+        Alert.alert("Erro", "Usuário não autenticado");
+        navigation.navigate("Login");
+        return;
+      }
 
-    navigation.navigate("Home");
+      await api.post(
+        "/pet",
+        { nome, especie: value },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-  } catch (error) {
-    console.log("Erro ao cadastrar pet:", error.response?.data || error.message);
+      navigation.navigate("Home");
+    } catch (error) {
+      console.log(
+        "Erro ao cadastrar pet:",
+        error.response?.data || error.message
+      );
 
-    const mensagem =
-      error.response?.data?.mensagem ||
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error.message ||
-      "Não foi possível cadastrar o pet.";
+      const mensagem =
+        error.response?.data?.mensagem ||
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Não foi possível cadastrar o pet.";
 
-    Alert.alert("Erro", mensagem);
-  }
-};
-
+      Alert.alert("Erro", mensagem);
+    }
+  };
 
   const handleSkip = () => navigation.navigate("Home");
 
@@ -73,9 +77,11 @@ export default function RegisterScreenPet({ navigation }) {
           value={nome}
           onChangeText={setNome}
         />
-         {nomeMensagem() ? (
-                <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text>
-              ) : null}
+        {nomeMensagem() ? (
+          <Text style={{ color: "red", marginBottom: 10 }}>
+            {nomeMensagem()}
+          </Text>
+        ) : null}
 
         <View style={Global.pickerContainer}>
           <Picker

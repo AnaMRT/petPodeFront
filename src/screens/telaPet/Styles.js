@@ -1,15 +1,16 @@
-import { StyleSheet,  Dimensions} from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 const CARD_SIZE = (width - 60) / 2;
 
 const Styles = StyleSheet.create({
- emptyContainer: {
+  emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
   },
+
   message: {
     fontSize: 18,
     fontWeight: "bold",
@@ -18,6 +19,7 @@ const Styles = StyleSheet.create({
     fontFamily: "Nunito_400Regular",
     marginBottom: 30,
   },
+
   addButton: {
     backgroundColor: "#6B4226",
     borderRadius: 20,
@@ -25,11 +27,13 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 30,
     alignSelf: "center",
   },
+
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
     fontFamily: "Nunito_400Regular",
   },
+
   petCard: {
     width: CARD_SIZE,
     height: CARD_SIZE + 40,
@@ -41,6 +45,7 @@ const Styles = StyleSheet.create({
     borderColor: "#A3B18A",
     borderRadius: 6,
   },
+
   petImage: {
     width: CARD_SIZE,
     height: CARD_SIZE,
@@ -48,6 +53,7 @@ const Styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
   },
+
   petName: {
     marginTop: 8,
     fontSize: 14,
@@ -55,6 +61,7 @@ const Styles = StyleSheet.create({
     color: "#6B4226",
     textAlign: "center",
   },
+
   addCard: {
     justifyContent: "center",
     alignItems: "center",
@@ -63,11 +70,13 @@ const Styles = StyleSheet.create({
     borderColor: "#A3B18A",
     backgroundColor: "#fff9f6",
   },
+
   addText: {
     fontSize: 16,
     color: "#6B4226",
     fontWeight: "bold",
   },
+
   deleteIcon: {
     position: "absolute",
     top: 6,
@@ -80,6 +89,7 @@ const Styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 10,
   },
+
   editIcon: {
     position: "absolute",
     top: 6,
@@ -92,7 +102,6 @@ const Styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 10,
   },
-
-})
+});
 
 export default Styles;

@@ -47,7 +47,7 @@ export const PlanoProvider = ({ children }) => {
   };
 
   return (
-    <PlanoContext.Provider 
+    <PlanoContext.Provider
       value={{ isAssinante, assinarPlano, cancelarPlano, resetarPlano }}
     >
       {children}

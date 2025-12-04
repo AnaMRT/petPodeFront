@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import { View, TextInput, Text, Alert, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Button } from "react-native-elements";
 import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
 import api from "../../../api";
 import { AuthContext } from "../../context/authContext/AuthContext.js";
@@ -22,7 +21,7 @@ export default function RegisterScreen({ navigation }) {
   const { login } = useContext(AuthContext);
   const { fetchUser } = useContext(UserContext);
 
-  const nomeMensagem = () => {
+  const nameMessage = () => {
     if (nome.length > 0 && nome.length < 2) {
       return "O nome deve ter pelo menos 2 caracteres.";
     }
@@ -32,7 +31,7 @@ export default function RegisterScreen({ navigation }) {
     return "";
   };
 
-  const emailMensagem = () => {
+  const emailMessage = () => {
     if (email.length > 0 && email.length < 5) {
       return "O email deve ter pelo menos 5 caracteres.";
     }
@@ -100,9 +99,9 @@ export default function RegisterScreen({ navigation }) {
           value={nome}
           onChangeText={setNome}
         />
-        {nomeMensagem() ? (
+        {nameMessage() ? (
           <Text style={{ color: "red", marginBottom: 10 }}>
-            {nomeMensagem()}
+            {nameMessage()}
           </Text>
         ) : null}
 
@@ -115,9 +114,9 @@ export default function RegisterScreen({ navigation }) {
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        {emailMensagem() ? (
+        {emailMessage() ? (
           <Text style={{ color: "red", marginBottom: 10 }}>
-            {emailMensagem()}
+            {emailMessage()}
           </Text>
         ) : null}
 

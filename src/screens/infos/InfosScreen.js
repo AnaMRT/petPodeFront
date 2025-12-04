@@ -22,7 +22,6 @@ function InfosScreen() {
         Como podemos ajudar?{"\n"}
         Contate nosso time:{"\n\n"}
       </Text>
-
       <TouchableOpacity onPress={copyEmail} onLongPress={openEmailApp}>
         <Text style={InfosStyles.email}>{email}</Text>
       </TouchableOpacity>

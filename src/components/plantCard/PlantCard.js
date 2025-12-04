@@ -7,7 +7,12 @@ import PlantCardStyles from "./Styles.js";
 import Global from "../../components/estilos/Styles.js";
 import { PlanoContext } from "../../context/planoContext/PlanoContext.js";
 
-export default function PlantCard({ planta, onPress, isFavorite = false, onToggleFavorite }) {
+export default function PlantCard({
+  planta,
+  onPress,
+  isFavorite = false,
+  onToggleFavorite,
+}) {
   const [favorito, setFavorito] = useState(isFavorite);
 
   const { isAssinante } = useContext(PlanoContext);
@@ -17,12 +22,8 @@ export default function PlantCard({ planta, onPress, isFavorite = false, onToggl
   }, [isFavorite]);
 
   const toggleFavorite = async () => {
-
     if (!isAssinante) {
-      Alert.alert(
-        "Recurso exclusivo",
-        "Assine o plano para favoritar plantas"
-      );
+      Alert.alert("Recurso exclusivo", "Assine o plano para favoritar plantas");
       return;
     }
 
@@ -42,17 +43,25 @@ export default function PlantCard({ planta, onPress, isFavorite = false, onToggl
 
       setFavorito(novoEstado);
       if (onToggleFavorite) onToggleFavorite(planta.id, novoEstado);
-
     } catch (error) {
       console.error("Erro ao atualizar favorito:", error);
     }
   };
 
   return (
-    <TouchableOpacity onPress={() => onPress(planta)} style={PlantCardStyles.card}>
-      <Image source={{ uri: planta.imagemUrl }} style={PlantCardStyles.imagem} />
+    <TouchableOpacity
+      onPress={() => onPress(planta)}
+      style={PlantCardStyles.card}
+    >
+      <Image
+        source={{ uri: planta.imagemUrl }}
+        style={PlantCardStyles.imagem}
+      />
 
-      <TouchableOpacity style={PlantCardStyles.favoriteIcon} onPress={toggleFavorite}>
+      <TouchableOpacity
+        style={PlantCardStyles.favoriteIcon}
+        onPress={toggleFavorite}
+      >
         <Ionicons
           name={favorito ? "star" : "star-outline"}
           size={22}

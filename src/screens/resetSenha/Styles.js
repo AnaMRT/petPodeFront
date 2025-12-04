@@ -1,8 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const Styles = StyleSheet.create({
-  
-    title: {
+  title: {
     fontSize: 64,
     marginBottom: 100,
     marginTop: -100,
@@ -10,7 +9,6 @@ const Styles = StyleSheet.create({
     fontFamily: "PlayfairDisplay_400Regular",
     color: "#2C2C2C",
   },
-
 });
 
 export default Styles;

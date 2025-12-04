@@ -14,7 +14,7 @@ export default function EditarPetScreen({ route, navigation }) {
   const [especie, setEspecie] = useState(pet?.especie || "");
   const { getErrorMessage } = useApiError();
 
-  const nomeMensagem = () => {
+  const nameMessage = () => {
     if (nome.length > 0 && nome.length < 2) {
       return "O nome deve ter pelo menos 2 caracteres.";
     }
@@ -25,32 +25,30 @@ export default function EditarPetScreen({ route, navigation }) {
   };
 
   const handleSave = async () => {
-  if (!nome.trim()) {
-    return Alert.alert("Erro", "O nome do pet é obrigatório.");
-  }
+    if (!nome.trim()) {
+      return Alert.alert("Erro", "O nome do pet é obrigatório.");
+    }
 
-  try {
-    const token = await AsyncStorage.getItem("userToken");
-    await api.put(`/pet/${pet.id}`, { nome, especie }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    Alert.alert("Sucesso", "Pet atualizado!", [
-      { text: "OK", onPress: () => navigation.goBack() },
-    ]);
-
-  } catch (error) {
-    console.error("Erro ao atualizar pet:", error.response?.data || error);
-    const mensagem = getErrorMessage(error);
-    Alert.alert("Erro", mensagem);
-  }
-};
-
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      await api.put(
+        `/pet/${pet.id}`,
+        { nome, especie },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      navigation.goBack();
+    } catch (error) {
+      console.error("Erro ao atualizar pet:", error.response?.data || error);
+      const mensagem = getErrorMessage(error);
+      Alert.alert("Erro", mensagem);
+    }
+  };
 
   return (
     <ScreenWrapper>
       <ScrollView contentContainerStyle={Global.containerEditar}>
-
         <Text style={Global.label}>NOME</Text>
         <TextInput
           value={nome}
@@ -59,19 +57,29 @@ export default function EditarPetScreen({ route, navigation }) {
           placeholder="Digite o nome do pet"
           placeholderTextColor="#6D6D6D"
         />
-         {nomeMensagem() ? (
-                        <Text style={{ color: "red", marginBottom: 10 }}>{nomeMensagem()}</Text>
-                      ) : null}
+        {nameMessage() ? (
+          <Text style={{ color: "red", marginBottom: 10 }}>
+            {nameMessage()}
+          </Text>
+        ) : null}
 
         <Text style={Global.label}>ESPÉCIE</Text>
         <View style={Global.pickerContainer}>
-          <Picker selectedValue={especie} onValueChange={setEspecie} prompt="Selecione a espécie">
+          <Picker
+            selectedValue={especie}
+            onValueChange={setEspecie}
+            prompt="Selecione a espécie"
+          >
             <Picker.Item label="Canino" value="canino" />
             <Picker.Item label="Felino" value="felino" />
           </Picker>
         </View>
 
-        <Button title="SALVAR" onPress={handleSave} buttonStyle={Global.saveButton} />
+        <Button
+          title="SALVAR"
+          onPress={handleSave}
+          buttonStyle={Global.saveButton}
+        />
       </ScrollView>
     </ScreenWrapper>
   );
