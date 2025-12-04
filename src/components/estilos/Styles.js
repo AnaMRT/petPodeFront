@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  //Tela de login, Cdastro Usuario e Pet
   container: {
     flex: 1,
     justifyContent: "center",
     padding: 20,
     backgroundColor: "#F9F3F6",
   },
+
   title: {
     fontSize: 64,
     marginBottom: 100,
@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     fontFamily: "PlayfairDisplay_400Regular",
     color: "#2C2C2C",
   },
+
   input: {
     borderWidth: 1,
     padding: 10,
@@ -27,6 +28,7 @@ const styles = StyleSheet.create({
     color: "#6D6D6D",
     backgroundColor: "#fff",
   },
+
   inputSenhaContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -40,12 +42,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  //Tela Home talvez tela de plantcard tela favoritos
   cardVazio: {
     flex: 1,
     margin: 5,
     backgroundColor: "transparent",
   },
+
   scrollTopButton: {
     position: "absolute",
     bottom: 45,
@@ -59,12 +61,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
+
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
+
   modalContent: {
     backgroundColor: "#fff",
     padding: 20,
@@ -73,18 +77,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
+
   modalStar: {
     position: "absolute",
     top: 15,
     right: 15,
     zIndex: 5,
   },
+
   imagemGrande: {
     width: 220,
     height: 220,
     borderRadius: 12,
     marginBottom: 10,
   },
+
   descricao: {
     fontSize: 14,
     textAlign: "center",
@@ -92,6 +99,7 @@ const styles = StyleSheet.create({
     color: "#2C2C2C",
     fontFamily: "Nunito_400Regular",
   },
+
   toxica: {
     fontSize: 14,
     color: "#D9534F",
@@ -99,6 +107,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontFamily: "Nunito_700Bold",
   },
+
   botaoFechar: {
     marginTop: 15,
     backgroundColor: "#6B4226",
@@ -106,10 +115,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     borderRadius: 8,
   },
+
   botaoFecharTexto: {
     color: "#fff",
     fontFamily: "Nunito_700Bold",
   },
+
   nome: {
     fontFamily: "Nunito_700Bold",
     fontSize: 14,
@@ -117,6 +128,7 @@ const styles = StyleSheet.create({
     color: "#2C2C2C",
     textTransform: "uppercase",
   },
+
   nomeCientifico: {
     fontSize: 12,
     fontStyle: "italic",
@@ -125,7 +137,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 2,
   },
-  //tela pet e tela de favoritas
+
   titulo: {
     fontSize: 40,
     color: "#2C2C2C",
@@ -133,16 +145,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontFamily: "PlayfairDisplay_700Bold",
   },
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+
   loadingText: {
     color: "#6B4226",
     fontFamily: "Nunito_400Regular",
     marginTop: 10,
   },
+
   message: {
     fontSize: 20,
     textAlign: "center",
@@ -150,11 +165,11 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito_700Bold",
     marginBottom: 30,
   },
+
   linha: {
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  //tela plano
 
   buttonText: {
     color: "#FFF",
@@ -162,12 +177,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Nunito_500Medium",
   },
-  //tela editar usuario
+
   containerEditar: {
     flex: 1,
     padding: 20,
     backgroundColor: "#F9F3F6",
   },
+
   label: {
     marginBottom: 6,
     color: "#2C2C2C",
@@ -188,36 +204,39 @@ const styles = StyleSheet.create({
     borderColor: "#A3B18A",
     marginBottom: 10,
   },
+
   saveButton: {
     backgroundColor: "#6B4226",
     borderRadius: 20,
     paddingVertical: 14,
     marginTop: 10,
     alignItems: "center",
-    justifyContent:"center"
+    justifyContent: "center",
   },
+
   saveButtonText: {
     color: "#fff",
     fontFamily: "Nunito_700Bold",
     fontSize: 14,
   },
 
-  //tela de editar pet
   pickerContainer: {
     borderWidth: 1,
     marginBottom: 10,
     borderRadius: 20,
     backgroundColor: "#fff",
   },
+
   picker: {
     color: "#6D6D6D",
   },
-  //tela Photo Usuario
+
   overlay: {
     flex: 1,
     backgroundColor: "#000000aa",
     justifyContent: "flex-end",
   },
+
   modalContainerPhoto: {
     backgroundColor: "white",
     padding: 20,
@@ -231,21 +250,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginVertical: 5,
   },
+
   optionText: {
     fontSize: 16,
     color: "#6B4226",
     textAlign: "center",
   },
+
   closeButton: {
     marginTop: 15,
     alignSelf: "center",
   },
+
   closeText: {
     color: "#6B4226",
     fontSize: 16,
   },
-  
-
 
   ButtonLoading: {
     backgroundColor: "#F4EDE4",

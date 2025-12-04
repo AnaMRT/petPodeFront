@@ -29,7 +29,7 @@ export default function PetsScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [petSelecionado, setPetSelecionado] = useState(null);
+  const [petsSelected, setPetsSelected] = useState(null);
   const [showButton, setShowButton] = useState(false);
   const flatListRef = useRef(null);
   const { getErrorMessage } = useApiError();
@@ -56,25 +56,25 @@ export default function PetsScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  const abrirModalFotoPet = (pet) => {
-    setPetSelecionado(pet);
+  const ModalPhotoPet = (pet) => {
+    setPetsSelected(pet);
     setModalVisible(true);
   };
 
-  const escolherDaGaleria = async () => {
+  const pickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
 
-    if (!result.canceled && petSelecionado) {
+    if (!result.canceled && petsSelected) {
       setModalVisible(false);
-      await handleChangePhoto(petSelecionado, result.assets[0].uri);
+      await handleChangePhoto(petsSelected, result.assets[0].uri);
     }
   };
 
-  const tirarFoto = async () => {
+  const pickFromCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
       alert("Permissão da câmera negada.");
@@ -87,9 +87,9 @@ export default function PetsScreen({ navigation }) {
       quality: 1,
     });
 
-    if (!result.canceled && petSelecionado) {
+    if (!result.canceled && petsSelected) {
       setModalVisible(false);
-      await handleChangePhoto(petSelecionado, result.assets[0].uri);
+      await handleChangePhoto(petsSelected, result.assets[0].uri);
     }
   };
 
@@ -118,8 +118,6 @@ export default function PetsScreen({ navigation }) {
           p.id === pet.id ? { ...p, imagemUrl: novaUrl } : p
         )
       );
-
-      Alert.alert("Sucesso", "Imagem atualizada!");
     } catch (error) {
       const mensagem = getErrorMessage(error);
       console.log("[ERRO AO ATUALIZAR IMAGEM]", mensagem, error);
@@ -143,9 +141,8 @@ export default function PetsScreen({ navigation }) {
     }
   };
 
-  const abrirCadastroPet = () => navigation.navigate("Cadastro de Pets");
-  const abrirEditarPet = (pet) =>
-    navigation.navigate("EditarPetScreen", { pet });
+  const openPetsRegistration = () => navigation.navigate("Cadastro de Pets");
+  const OpenEditPets = (pet) => navigation.navigate("EditarPetScreen", { pet });
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -178,7 +175,7 @@ export default function PetsScreen({ navigation }) {
             </Text>
             <Button
               title="CADASTRAR PET"
-              onPress={abrirCadastroPet}
+              onPress={openPetsRegistration}
               buttonStyle={PetStyles.addButton}
               titleStyle={PetStyles.buttonText}
             />
@@ -198,13 +195,13 @@ export default function PetsScreen({ navigation }) {
                 item.isNew ? (
                   <TouchableOpacity
                     style={[PetStyles.petCard, PetStyles.addCard]}
-                    onPress={abrirCadastroPet}
+                    onPress={openPetsRegistration}
                   >
                     <Text style={PetStyles.addText}>＋ Adicionar pet</Text>
                   </TouchableOpacity>
                 ) : (
                   <View style={PetStyles.petCard}>
-                    <TouchableOpacity onPress={() => abrirModalFotoPet(item)}>
+                    <TouchableOpacity onPress={() => ModalPhotoPet(item)}>
                       <Image
                         source={
                           item.imagemUrl
@@ -241,7 +238,7 @@ export default function PetsScreen({ navigation }) {
 
                     <TouchableOpacity
                       style={PetStyles.editIcon}
-                      onPress={() => abrirEditarPet(item)}
+                      onPress={() => OpenEditPets(item)}
                     >
                       <Feather name="edit-2" size={20} color="#FFF" />
                     </TouchableOpacity>
@@ -261,8 +258,8 @@ export default function PetsScreen({ navigation }) {
             <PhotoPickerModalPet
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
-              onPickGallery={escolherDaGaleria}
-              onPickCamera={tirarFoto}
+              onPickGallery={pickFromGallery}
+              onPickCamera={pickFromCamera}
             />
 
             {uploading && (

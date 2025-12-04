@@ -8,6 +8,7 @@ const Styles = StyleSheet.create({
     fontWeight: "700",
     color: "#2C2C2C",
   },
+
   deleteButton: {
     backgroundColor: "#D9534F",
     borderRadius: 20,
@@ -16,14 +17,17 @@ const Styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   deleteButtonText: {
     color: "#fff",
     fontFamily: "Nunito_700Bold",
     fontSize: 14,
   },
+
   deleteButtonLoading: {
     backgroundColor: "#ffdddd",
   },
+
   deleteButtonLoadingText: {
     color: "#D9534F",
     fontFamily: "Nunito_700Bold",

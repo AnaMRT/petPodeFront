@@ -1,8 +1,7 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-
-    card: {
+  card: {
     flex: 1,
     backgroundColor: "#fff",
     borderWidth: 1,
@@ -12,18 +11,21 @@ const styles = StyleSheet.create({
     position: "relative",
     borderRadius: 6,
   },
+
   imagem: {
     width: "100%",
     height: 150,
-    borderTopLeftRadius:6,
-    borderTopRightRadius:6,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
   },
+
   favoriteIcon: {
     position: "absolute",
     top: 8,
     right: 8,
     zIndex: 10,
   },
+
   textBox: {
     paddingVertical: 5,
     alignItems: "center",

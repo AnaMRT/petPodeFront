@@ -7,10 +7,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#6B4226",
   },
+
   subtitle: {
     fontWeight: "600",
     marginBottom: 5,
   },
+
   avatar: {
     width: 60,
     height: 60,
@@ -19,10 +21,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#A3B18A",
   },
+
   options: {
     marginTop: 20,
   },
-
 });
 
 export default styles;

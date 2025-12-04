@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ScreenWrapper from "../../components/screenWrapper/ScreenWrapper.js";
 import { UserContext } from "../../context/userContext/UserContext.js";
@@ -27,14 +26,14 @@ export default function EditarPerfilScreen({ navigation }) {
   const [deleting, setDeleting] = useState(false);
   const { getErrorMessage } = useApiError();
 
-  const nomeMensagem = () => {
+  const nameMessage = () => {
     if (nome.length > 0 && nome.length < 2)
       return "O nome deve ter pelo menos 2 caracteres.";
     if (nome.length > 100) return "O nome não pode ter mais de 100 caracteres.";
     return "";
   };
 
-  const emailMensagem = () => {
+  const emailMessage = () => {
     if (email.length > 0 && email.length < 5)
       return "O email deve ter pelo menos 5 caracteres.";
     if (email.length > 32) return "O email não pode ter mais de 32 caracteres.";
@@ -135,9 +134,9 @@ export default function EditarPerfilScreen({ navigation }) {
           value={nome}
           onChangeText={setNome}
         />
-        {nomeMensagem() ? (
+        {nameMessage() ? (
           <Text style={{ color: "red", marginBottom: 10 }}>
-            {nomeMensagem()}
+            {nameMessage()}
           </Text>
         ) : null}
 
@@ -151,9 +150,9 @@ export default function EditarPerfilScreen({ navigation }) {
           autoCapitalize="none"
         />
 
-        {emailMensagem() ? (
+        {emailMessage() ? (
           <Text style={{ color: "red", marginBottom: 10 }}>
-            {emailMensagem()}
+            {emailMessage()}
           </Text>
         ) : null}
 
@@ -198,10 +197,7 @@ export default function EditarPerfilScreen({ navigation }) {
           activeOpacity={0.7}
         >
           <Text
-            style={[
-              Global.saveButtonText,
-              loading && Global.ButtonLoadingText,
-            ]}
+            style={[Global.saveButtonText, loading && Global.ButtonLoadingText]}
           >
             {loading ? "SALVANDO..." : "SALVAR ALTERAÇÕES"}
           </Text>
