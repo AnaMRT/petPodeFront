@@ -2,7 +2,7 @@
   "expo": {
     "name": "Pet Pode?",
     "slug": "petpode",
-    "version": "1.0.10",
+    "version": "1.0.13",
     "orientation": "portrait",
     "icon": "./assets/icon-logo.png",
     "userInterfaceStyle": "light",
@@ -13,6 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "assets/*"
+    ],
     "ios": {
       "supportsTablet": true
     },

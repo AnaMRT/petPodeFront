@@ -65,8 +65,7 @@ export default function EditarPetScreen({ route, navigation }) {
 
         <Text style={Global.label}>ESPÉCIE</Text>
         <View style={Global.pickerContainer}>
-          <Picker selectedValue={especie} onValueChange={setEspecie}>
-            <Picker.Item label="Selecione a espécie" value="" />
+          <Picker selectedValue={especie} onValueChange={setEspecie} prompt="Selecione a espécie">
             <Picker.Item label="Canino" value="canino" />
             <Picker.Item label="Felino" value="felino" />
           </Picker>
